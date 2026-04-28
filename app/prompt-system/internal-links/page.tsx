@@ -6,6 +6,8 @@ import { PromptSystemNav } from "@/components/prompt-system/prompt-system-nav";
 import { InternalLinksTable } from "@/components/prompt-system/internal-links-table";
 import { listInternalLinks } from "@/lib/supabase/prompt-system-repository";
 
+type InternalLinks = Awaited<ReturnType<typeof listInternalLinks>>;
+
 export const metadata: Metadata = { title: "Internal Links" };
 export const dynamic = "force-dynamic";
 
@@ -15,7 +17,7 @@ const headerPanelClass =
 export default async function InternalLinksPage() {
   const access = await requirePageRoleForPath("viewer", "/prompt-system/internal-links");
 
-  let links = [];
+  let links: InternalLinks = [];
   let loadError: string | null = null;
 
   try {

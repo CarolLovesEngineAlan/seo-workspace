@@ -27,7 +27,7 @@ export default async function PromptLibraryPage() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <ProjectNavigation activeKey="promptLibrary" variant="warm" />
+              <ProjectNavigation activeKey="promptSystem" variant="warm" />
               <UserMenu
                 userEmail={access.user.email || ""}
                 role={access.role}

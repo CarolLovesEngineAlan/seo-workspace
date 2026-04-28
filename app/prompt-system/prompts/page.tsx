@@ -6,6 +6,8 @@ import { PromptSystemNav } from "@/components/prompt-system/prompt-system-nav";
 import { PromptsTable } from "@/components/prompt-system/prompts-table";
 import { listPrompts } from "@/lib/supabase/prompt-system-repository";
 
+type Prompts = Awaited<ReturnType<typeof listPrompts>>;
+
 export const metadata: Metadata = { title: "Prompt Library" };
 export const dynamic = "force-dynamic";
 
@@ -15,7 +17,7 @@ const headerPanelClass =
 export default async function PromptsPage() {
   const access = await requirePageRoleForPath("viewer", "/prompt-system/prompts");
 
-  let prompts = [];
+  let prompts: Prompts = [];
   let loadError: string | null = null;
 
   try {
