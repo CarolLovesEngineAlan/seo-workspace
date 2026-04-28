@@ -8,8 +8,7 @@ import {
   Waypoints,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand/brand-mark";
-import { GoogleOneTap } from "@/components/auth/google-one-tap";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { EmailSignInForm } from "@/components/auth/email-sign-in-form";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { normalizeNextPath } from "@/lib/auth/next-path";
 import { getAccessContext } from "@/lib/auth/server";
@@ -147,27 +146,21 @@ export default async function LoginPage({
               Enter the workspace
             </h2>
             <p className="mt-3 text-[14px] leading-7 text-[#5e6860]">
-              Continue with your Google account to open the production workspace.
+              输入邮箱，我们会发送一个登录链接。
             </p>
 
             {loginUnavailable ? (
               <div className="mt-8 rounded-[20px] border border-[rgba(178,72,63,0.18)] bg-[rgba(255,245,244,0.88)] px-4 py-4 text-[13px] leading-7 text-[#b2483f]">
-                Sign-in is temporarily unavailable.
-              </div>
-            ) : null}
-
-            {error ? (
-              <div className="mt-4 rounded-[20px] border border-[rgba(178,72,63,0.18)] bg-[rgba(255,245,244,0.88)] px-4 py-4 text-[13px] leading-7 text-[#b2483f]">
-                Unable to complete sign-in. Please try again.
+                登录暂时不可用，请稍后再试。
               </div>
             ) : null}
 
             {access?.user ? (
               <div className="mt-8 space-y-4">
                 <div className="rounded-[20px] border border-[rgba(28,34,29,0.1)] bg-[rgba(255,255,255,0.74)] px-4 py-4 text-[14px] leading-7 text-[#1c221d]">
-                  <div className="font-medium">Access is not ready yet.</div>
+                  <div className="font-medium">该账号暂无访问权限。</div>
                   <div className="mt-2 text-[#5e6860]">
-                    This account has been verified but is not yet enabled for the workspace.
+                    邮箱已验证，但尚未被授权进入工作台。
                   </div>
                   <div className="mt-3 text-[13px] text-[#5e6860]">{access.user.email}</div>
                 </div>
@@ -175,15 +168,7 @@ export default async function LoginPage({
               </div>
             ) : (
               <div className="mt-8">
-                <GoogleOneTap next={next} />
-                <GoogleSignInButton
-                  next={next}
-                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#1d7a5f] px-6 text-[14px] font-medium text-white shadow-[0_18px_36px_rgba(29,122,95,0.18)] transition-all hover:translate-y-[-1px] hover:bg-[#17654f]"
-                />
-                <p className="mt-4 text-center text-[12px] leading-6 text-[#7b837d]">
-                  One Tap appears automatically on supported browsers. Standard Google
-                  sign-in is always available below it.
-                </p>
+                {!loginUnavailable && <EmailSignInForm next={next} />}
               </div>
             )}
 
