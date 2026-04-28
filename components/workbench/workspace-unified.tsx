@@ -520,7 +520,7 @@ export function WorkspaceUnified({
         if (!response.ok) {
           const payload = await response.json().catch(() => ({}));
           throw new Error(
-            payload.error ?? (response.statusText || "加载 Prompt 列表失败。")
+            (payload.error ?? response.statusText) || "加载 Prompt 列表失败。"
           );
         }
         return response.json() as Promise<PromptLibrary>;

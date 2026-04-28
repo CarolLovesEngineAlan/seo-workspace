@@ -17,7 +17,7 @@ const headerPanelClass =
 export default async function PromptsPage() {
   const access = await requirePageRoleForPath("viewer", "/prompt-system/prompts");
 
-  let prompts: Prompts = [];
+  let prompts: Awaited<ReturnType<typeof listPrompts>> = [];
   let loadError: string | null = null;
 
   try {

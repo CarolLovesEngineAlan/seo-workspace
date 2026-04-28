@@ -17,7 +17,7 @@ const headerPanelClass =
 export default async function InternalLinksPage() {
   const access = await requirePageRoleForPath("viewer", "/prompt-system/internal-links");
 
-  let links: InternalLinks = [];
+  let links: Awaited<ReturnType<typeof listInternalLinks>> = [];
   let loadError: string | null = null;
 
   try {
