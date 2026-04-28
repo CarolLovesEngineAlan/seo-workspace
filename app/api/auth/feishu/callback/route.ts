@@ -74,7 +74,9 @@ export async function GET(request: Request) {
   const state = searchParams.get("state");
   const next = normalizeNextPath(state ? decodeURIComponent(state) : "/workbench");
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL?.trim() || origin).replace(/\/$/, "");
-  const loginUrl = `${origin}/login`;
+  // Use appUrl (not request origin) — Next.js standalone reports HOSTNAME:PORT
+  // (0.0.0.0:3000) as origin, so error redirects would land on an unreachable URL.
+  const loginUrl = `${appUrl}/login`;
 
   if (!code) {
     return NextResponse.redirect(`${loginUrl}?error=missing_code`);
