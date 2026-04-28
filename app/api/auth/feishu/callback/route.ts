@@ -59,8 +59,9 @@ async function fetchUserInfo(
   };
   const email = json.data?.email || json.data?.enterprise_email;
   if (!email) {
+    const fields = Object.keys(json.data ?? {}).join(", ") || "none";
     throw new Error(
-      "无法获取飞书邮箱，请在飞书开放平台开通 contact:user.email:readonly 权限"
+      `无法获取飞书邮箱（返回字段: ${fields}），请在飞书开放平台开通 contact:user.email:readonly 权限并发布新版本`
     );
   }
   return { email, name: json.data?.name ?? "" };
