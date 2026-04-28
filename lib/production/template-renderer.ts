@@ -1,0 +1,225 @@
+import fs from "fs";
+import path from "path";
+import { parse, type HTMLElement } from "node-html-parser";
+
+const TEMPLATES_DIR = path.join(process.cwd(), "lib/production/html-templates");
+
+const PAGE_TEMPLATE_FILES: Record<string, string> = {
+  feature_page: "features-template-v1.html",
+  model_page: "model-template-v1.html",
+  use_case_page: "use-case-template-v1.html",
+};
+
+type Json = Record<string, unknown>;
+
+type SectionPlan = {
+  jsonKey: string | null;
+};
+
+const FEATURE_PAGE_PLAN: SectionPlan[] = [
+  { jsonKey: "hero" },
+  { jsonKey: "how_it_works" },
+  { jsonKey: "features" },
+  { jsonKey: "comparison" },
+  { jsonKey: null },
+  { jsonKey: "testimonials" },
+  { jsonKey: "faq" },
+  { jsonKey: "cta_banner" },
+];
+
+const MODEL_PAGE_PLAN: SectionPlan[] = [
+  { jsonKey: "hero" },
+  { jsonKey: null },
+  { jsonKey: "capabilities" },
+  { jsonKey: "comparison" },
+  { jsonKey: "how_to_use" },
+  { jsonKey: null },
+  { jsonKey: "faq" },
+  { jsonKey: "cta_banner" },
+];
+
+const USE_CASE_PAGE_PLAN: SectionPlan[] = [
+  { jsonKey: "hero" },
+  { jsonKey: "showcase" },
+  { jsonKey: "features" },
+  { jsonKey: "testimonials" },
+  { jsonKey: "faq" },
+  { jsonKey: "cta_banner" },
+];
+
+const PAGE_PLANS: Record<string, SectionPlan[]> = {
+  feature_page: FEATURE_PAGE_PLAN,
+  model_page: MODEL_PAGE_PLAN,
+  use_case_page: USE_CASE_PAGE_PLAN,
+};
+
+function readTemplate(file: string): string {
+  return fs.readFileSync(path.join(TEMPLATES_DIR, file), "utf-8");
+}
+
+function pickString(obj: Json, keys: string[]): string | undefined {
+  for (const k of keys) {
+    const v = obj[k];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return undefined;
+}
+
+function pickArray(obj: Json, keys: string[]): Json[] | undefined {
+  for (const k of keys) {
+    const v = obj[k];
+    if (Array.isArray(v) && v.length > 0) return v as Json[];
+  }
+  return undefined;
+}
+
+function setText(el: HTMLElement | null, text: string | undefined): void {
+  if (!el || !text) return;
+  el.set_content(text);
+}
+
+function fillSection(section: HTMLElement, data: Json): void {
+  // Title: h1 → h2 (whichever appears first)
+  const heading = section.querySelector("h1") ?? section.querySelector("h2");
+  setText(heading, pickString(data, ["h1", "h2", "title", "headline"]));
+
+  // First paragraph directly inside section (skip inside items / nested groups)
+  const firstP = findFirstTopLevelP(section);
+  setText(firstP, pickString(data, ["subheadline", "subtitle", "description", "body"]));
+
+  // CTA button text
+  const cta = pickString(data, ["cta_primary", "cta_label", "cta", "button_label"]);
+  if (cta) {
+    const btn = findCtaElement(section);
+    setText(btn, cta);
+  }
+
+  // Items array → fill each data-pexo-block="item"
+  const items = pickArray(data, ["items", "steps", "rows", "faqs"]);
+  if (items && items.length > 0) {
+    fillItems(section, items);
+  }
+}
+
+function findFirstTopLevelP(section: HTMLElement): HTMLElement | null {
+  // Search BFS for a <p> that is not inside data-pexo-block="item"
+  const stack: HTMLElement[] = [section];
+  while (stack.length) {
+    const el = stack.shift()!;
+    for (const child of el.childNodes as unknown as HTMLElement[]) {
+      if (!child || child.nodeType !== 1) continue;
+      const tag = child.tagName?.toLowerCase();
+      if (child.getAttribute?.("data-pexo-block") === "item") continue;
+      if (tag === "p") return child;
+      stack.push(child);
+    }
+  }
+  return null;
+}
+
+function findCtaElement(section: HTMLElement): HTMLElement | null {
+  const candidates = section.querySelectorAll("a, button");
+  for (const el of candidates) {
+    // Skip inputs / icon-only buttons / send buttons
+    if (el.querySelector("svg") && (!el.text || el.text.trim().length < 3)) continue;
+    if (el.getAttribute("aria-label")?.toLowerCase().includes("send")) continue;
+    if (el.getAttribute("aria-label")?.toLowerCase().includes("attach")) continue;
+    if (el.text && el.text.trim().length >= 3) return el;
+  }
+  return null;
+}
+
+function fillItems(section: HTMLElement, items: Json[]): void {
+  const itemEls = section.querySelectorAll('[data-pexo-block="item"]');
+  // If there are nested items (e.g. comparison rows), this still works
+  itemEls.forEach((el, i) => {
+    const item = items[i];
+    if (!item || typeof item !== "object") return;
+
+    const title =
+      pickString(item, ["title", "label", "scenario_label", "name", "question", "h3", "h4", "feature_label"]);
+    const titleEl = el.querySelector("h3") ?? el.querySelector("h4");
+    setText(titleEl, title);
+
+    const body = pickString(item, [
+      "body",
+      "description",
+      "answer",
+      "scenario_body",
+      "summary",
+      "quote",
+      "text",
+    ]);
+    const ps = el.querySelectorAll("p");
+    if (ps[0]) setText(ps[0], body);
+  });
+}
+
+function buildHtmlDocument(meta: Json | undefined, body: string): string {
+  const m = meta ?? {};
+  const title = pickString(m, ["page_title", "og_title"]) ?? "Pexo Draft";
+  const desc = pickString(m, ["meta_description", "og_description"]) ?? "";
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapeHtml(title)}</title>
+<meta name="description" content="${escapeHtml(desc)}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: linear-gradient(180deg,#ede6d0 0%,#f2ebd8 50%,#ede8da 100%); color:#0D0D1A; min-height:100vh; }
+  .font-poppins { font-family: 'Poppins', sans-serif; }
+  .font-inter { font-family: 'Inter', sans-serif; }
+  main.draft-wrap { max-width: 1280px; margin: 0 auto; padding: 32px 16px; display: flex; flex-direction: column; gap: 24px; }
+  .draft-bar { background: #1d7a5f; color: #fff; text-align: center; padding: 9px 16px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; position: sticky; top: 0; z-index: 100; }
+</style>
+</head>
+<body>
+<div class="draft-bar">Draft preview · For review only</div>
+<main class="draft-wrap">
+${body}
+</main>
+</body>
+</html>`;
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+export function renderPageHtmlFromTemplate(pageType: string, json: unknown): string | null {
+  const file = PAGE_TEMPLATE_FILES[pageType];
+  const plan = PAGE_PLANS[pageType];
+  if (!file || !plan) return null;
+
+  let templateHtml: string;
+  try {
+    templateHtml = readTemplate(file);
+  } catch {
+    return null;
+  }
+
+  const root = parse(templateHtml, { lowerCaseTagName: false, comment: true });
+  const data = (json ?? {}) as Json;
+
+  // Apply per-section plan
+  const sections = root.querySelectorAll('[data-pexo-block="section"]');
+  sections.forEach((section, i) => {
+    const cfg = plan[i];
+    if (!cfg) return;
+    if (cfg.jsonKey === null) return; // keep template content as-is
+    const segment = data[cfg.jsonKey] as Json | undefined;
+    if (!segment || typeof segment !== "object") return;
+    fillSection(section, segment);
+  });
+
+  return buildHtmlDocument(data.meta as Json | undefined, root.toString());
+}

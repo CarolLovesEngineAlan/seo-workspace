@@ -625,7 +625,13 @@ function renderModelPage(data: ModelPageData): string {
 // Main dispatch
 // ═══════════════════════════════════════════════════════════════════════════════
 
+import { renderPageHtmlFromTemplate } from "./template-renderer";
+
 export function renderPageHtml(pageType: string, json: unknown): string {
+  // Prefer the design template (lib/production/html-templates/*.html)
+  const fromTemplate = renderPageHtmlFromTemplate(pageType, json);
+  if (fromTemplate) return fromTemplate;
+
   const data = json as Record<string, unknown>;
   switch (pageType) {
     case "feature_page":

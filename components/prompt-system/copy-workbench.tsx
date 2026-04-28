@@ -3,7 +3,6 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import type { PsPrompt } from "@/lib/types/prompt-system";
 import { PAGE_TYPE_LABELS, PROMPT_STEP_LABELS } from "@/lib/types/prompt-system";
-import { renderPageHtml } from "@/lib/production/html-renderer";
 
 const panelClass =
   "rounded-[22px] border border-[rgba(28,34,29,0.12)] bg-[rgba(255,252,244,0.92)] shadow-[0_20px_60px_rgba(44,38,22,0.08)]";
@@ -162,10 +161,19 @@ export function CopyWorkbench({ copyPrompts }: { copyPrompts: PsPrompt[] }) {
     URL.revokeObjectURL(url);
   };
 
-  const handleDownloadHtml = () => {
+  const handleDownloadHtml = async () => {
     if (!copyJson || !selectedPrompt) return;
     try {
-      const html = renderPageHtml(selectedPrompt.pageType, copyJson);
+      const res = await fetch("/api/prompt-system/export-html", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pageType: selectedPrompt.pageType, json: copyJson }),
+      });
+      if (!res.ok) {
+        const err = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(err.error || `导出失败 (${res.status})`);
+      }
+      const html = await res.text();
       const slug = primaryKeyword.trim().toLowerCase().replace(/\s+/g, "-") || "page";
       const blob = new Blob([html], { type: "text/html;charset=utf-8" });
       const url = URL.createObjectURL(blob);
