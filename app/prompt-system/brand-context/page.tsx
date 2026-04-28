@@ -7,6 +7,7 @@ import { BrandContextForm } from "@/components/prompt-system/brand-context-form"
 import { getBrandContext } from "@/lib/supabase/prompt-system-repository";
 
 export const metadata: Metadata = { title: "Brand Context" };
+export const dynamic = "force-dynamic";
 
 const headerPanelClass =
   "overflow-hidden rounded-[24px] border border-[rgba(28,34,29,0.1)] bg-[rgba(255,252,244,0.9)] shadow-[0_20px_60px_rgba(44,38,22,0.11)]";
