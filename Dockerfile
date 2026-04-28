@@ -22,6 +22,9 @@ ARG HTTPS_PROXY
 ARG NO_PROXY
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Next.js standalone copies public/ into the runner stage; ensure it exists
+# even if the project doesn't ship static assets.
+RUN mkdir -p ./public
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
