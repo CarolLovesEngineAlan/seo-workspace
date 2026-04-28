@@ -8,7 +8,12 @@ export async function GET(request: Request) {
   const next = normalizeNextPath(searchParams.get("next") ?? "/workbench");
 
   const appId = process.env.FEISHU_APP_ID?.trim();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || origin;
+  const headers = request instanceof Request ? request.headers : new Headers();
+  const forwardedProto = headers.get("x-forwarded-proto")?.split(",")[0].trim();
+  const forwardedHost = headers.get("x-forwarded-host")?.split(",")[0].trim();
+  const inferredOrigin =
+    forwardedProto && forwardedHost ? `${forwardedProto}://${forwardedHost}` : origin;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || inferredOrigin;
 
   if (!appId) {
     return NextResponse.redirect(`${origin}/login?error=feishu_not_configured`);

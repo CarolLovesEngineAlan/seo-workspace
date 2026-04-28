@@ -34,7 +34,7 @@ async function getAppAccessToken(): Promise<string> {
 
 async function getUserAccessToken(code: string, appAccessToken: string): Promise<string> {
   const res = await fetch(
-    "https://open.feishu.cn/open-apis/authen/v1/oidc_access_token",
+    "https://open.feishu.cn/open-apis/authen/v1/access_token",
     {
       method: "POST",
       headers: {
@@ -73,9 +73,11 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const next = normalizeNextPath(state ? decodeURIComponent(state) : "/workbench");
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL?.trim() || origin).replace(/\/$/, "");
-  // Use appUrl (not request origin) — Next.js standalone reports HOSTNAME:PORT
-  // (0.0.0.0:3000) as origin, so error redirects would land on an unreachable URL.
+  const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0].trim();
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0].trim();
+  const inferredOrigin =
+    forwardedProto && forwardedHost ? `${forwardedProto}://${forwardedHost}` : origin;
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL?.trim() || inferredOrigin).replace(/\/$/, "");
   const loginUrl = `${appUrl}/login`;
 
   if (!code) {
