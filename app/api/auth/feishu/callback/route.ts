@@ -4,6 +4,15 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin-client";
 
 export const dynamic = "force-dynamic";
 
+async function safeJson(res: Response): Promise<unknown> {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`飞书接口返回非 JSON (${res.status}): ${text.slice(0, 200)}`);
+  }
+}
+
 async function getAppAccessToken(): Promise<string> {
   const res = await fetch(
     "https://open.feishu.cn/open-apis/auth/v3/app_access_token/internal",
@@ -16,9 +25,9 @@ async function getAppAccessToken(): Promise<string> {
       }),
     }
   );
-  const json = (await res.json()) as { app_access_token?: string; msg?: string };
+  const json = await safeJson(res) as { app_access_token?: string; msg?: string };
   if (!json.app_access_token) {
-    throw new Error(`获取飞书 app_access_token 失败: ${json.msg ?? "unknown"}`);
+    throw new Error(`获取飞书 app_access_token 失败: ${json.msg ?? JSON.stringify(json)}`);
   }
   return json.app_access_token;
 }
@@ -35,11 +44,7 @@ async function getUserAccessToken(code: string, appAccessToken: string): Promise
       body: JSON.stringify({ grant_type: "authorization_code", code }),
     }
   );
-  const json = (await res.json()) as {
-    data?: { access_token?: string };
-    msg?: string;
-    code?: number;
-  };
+  const json = await safeJson(res) as { data?: { access_token?: string }; msg?: string; code?: number };
   const token = json.data?.access_token;
   if (!token) {
     throw new Error(`飞书 code 换取 token 失败: ${json.msg ?? JSON.stringify(json)}`);
@@ -47,16 +52,12 @@ async function getUserAccessToken(code: string, appAccessToken: string): Promise
   return token;
 }
 
-async function fetchUserInfo(
-  userAccessToken: string
-): Promise<{ email: string; name: string }> {
+async function fetchUserInfo(userAccessToken: string): Promise<{ email: string; name: string }> {
   const res = await fetch(
     "https://open.feishu.cn/open-apis/authen/v1/user_info",
     { headers: { Authorization: `Bearer ${userAccessToken}` } }
   );
-  const json = (await res.json()) as {
-    data?: { email?: string; enterprise_email?: string; name?: string };
-  };
+  const json = await safeJson(res) as { data?: { email?: string; enterprise_email?: string; name?: string } };
   const email = json.data?.email || json.data?.enterprise_email;
   if (!email) {
     const fields = Object.keys(json.data ?? {}).join(", ") || "none";
