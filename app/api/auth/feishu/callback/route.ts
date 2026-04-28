@@ -13,43 +13,25 @@ async function safeJson(res: Response): Promise<unknown> {
   }
 }
 
-async function getAppAccessToken(): Promise<string> {
+async function getUserAccessToken(code: string): Promise<string> {
   const res = await fetch(
-    "https://open.feishu.cn/open-apis/auth/v3/app_access_token/internal",
+    "https://open.feishu.cn/open-apis/authen/v2/oauth/token",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        app_id: process.env.FEISHU_APP_ID?.trim(),
-        app_secret: process.env.FEISHU_APP_SECRET?.trim(),
+        grant_type: "authorization_code",
+        client_id: process.env.FEISHU_APP_ID?.trim(),
+        client_secret: process.env.FEISHU_APP_SECRET?.trim(),
+        code,
       }),
     }
   );
-  const json = await safeJson(res) as { app_access_token?: string; msg?: string };
-  if (!json.app_access_token) {
-    throw new Error(`获取飞书 app_access_token 失败: ${json.msg ?? JSON.stringify(json)}`);
+  const json = await safeJson(res) as { access_token?: string; error?: string; error_description?: string };
+  if (!json.access_token) {
+    throw new Error(`飞书 code 换取 token 失败: ${json.error_description ?? json.error ?? JSON.stringify(json)}`);
   }
-  return json.app_access_token;
-}
-
-async function getUserAccessToken(code: string, appAccessToken: string): Promise<string> {
-  const res = await fetch(
-    "https://open.feishu.cn/open-apis/authen/v1/access_token",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${appAccessToken}`,
-      },
-      body: JSON.stringify({ grant_type: "authorization_code", code }),
-    }
-  );
-  const json = await safeJson(res) as { data?: { access_token?: string }; msg?: string; code?: number };
-  const token = json.data?.access_token;
-  if (!token) {
-    throw new Error(`飞书 code 换取 token 失败: ${json.msg ?? JSON.stringify(json)}`);
-  }
-  return token;
+  return json.access_token;
 }
 
 async function fetchUserInfo(userAccessToken: string): Promise<{ email: string; name: string }> {
@@ -85,8 +67,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const appAccessToken = await getAppAccessToken();
-    const userAccessToken = await getUserAccessToken(code, appAccessToken);
+    const userAccessToken = await getUserAccessToken(code);
     const { email, name } = await fetchUserInfo(userAccessToken);
 
     const admin = getSupabaseAdmin();
