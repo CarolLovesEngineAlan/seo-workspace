@@ -4,12 +4,12 @@
  * Required env vars:
  *   GEMINI_API_KEY
  * Optional:
- *   GEMINI_COPY_MODEL  (default: gemini-3-0-flash)
+ *   GEMINI_COPY_MODEL  (default: gemini-2.5-flash)
  */
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const DEFAULT_MODEL = "gemini-3-0-flash";
+const DEFAULT_MODEL = "gemini-2.5-flash";
 
 function readEnv(name: string): string | null {
   const v = process.env[name]?.trim();
