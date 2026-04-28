@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SEO Opportunity Workspace — Unified</title>
+    <style>
+      :root {
+        --bg: #f1ead8;
+        --surface: rgba(255, 252, 244, 0.9);
+        --surface-strong: #fffdf8;
+        --surface-soft: rgba(244, 240, 230, 0.85);
+        --ink: #1c221d;
+        --muted: #5e6860;
+        --line: rgba(28, 34, 29, 0.1);
+        --accent: #1d7a5f;
+        --accent-bg: rgba(29, 122, 95, 0.1);
+        --amber: #b38318;
+        --amber-bg: rgba(179, 131, 24, 0.12);
+        --danger: #b2483f;
+        --danger-bg: rgba(178, 72, 63, 0.1);
+        --ok: #2c7f52;
+        --ok-bg: rgba(44, 127, 82, 0.1);
+        --shadow-panel: 0 20px 60px rgba(44, 38, 22, 0.11);
+        --radius-lg: 24px;
+        --radius-md: 18px;
+        --radius-sm: 12px;
+        --radius-pill: 999px;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(ellipse 60% 40% at 8% 0%, rgba(218, 188, 96, 0.22), transparent),
+          radial-gradient(ellipse 40% 50% at 92% 10%, rgba(29, 122, 95, 0.1), transparent),
+          linear-gradient(180deg, #ede6d0 0%, #f2ebd8 50%, #ede8da 100%);
+        min-height: 100vh;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      /* ─── Shell ─── */
+      .shell { max-width: 1540px; margin: 0 auto; padding: 24px; }
+
+      /* ─── Top bar ─── */
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 22px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-panel);
+        margin-bottom: 18px;
+      }
+      .topbar-brand { display: flex; align-items: center; gap: 10px; }
+      .topbar-logo {
+        width: 34px; height: 34px; border-radius: 10px;
+        background: var(--accent); display: flex; align-items: center;
+        justify-content: center; color: #fff; font-size: 15px; font-weight: 700;
+        flex-shrink: 0;
+      }
+      .topbar-title { font-size: 15px; font-weight: 600; }
+      .topbar-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+      .topbar-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+      .stat-pill {
+        padding: 6px 12px; border-radius: var(--radius-pill);
+        background: var(--surface-soft); border: 1px solid var(--line);
+        font-size: 12px; white-space: nowrap;
+      }
+      .stat-pill strong { color: var(--ink); }
+      .stat-pill span { color: var(--muted); margin-left: 4px; }
+
+      /* ─── Nav tabs ─── */
+      .nav-tabs {
+        display: flex; gap: 4px;
+        background: var(--surface-soft);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-pill);
+        padding: 4px;
+        margin-bottom: 18px;
+        width: fit-content;
+      }
+      .nav-tab {
+        padding: 8px 18px;
+        border-radius: var(--radius-pill);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        color: var(--muted);
+        border: none;
+        background: transparent;
+        transition: all 130ms ease;
+        display: flex; align-items: center; gap: 7px;
+        font-family: inherit;
+      }
+      .nav-tab:hover { color: var(--ink); background: rgba(255,255,255,0.5); }
+      .nav-tab.active {
+        background: var(--surface-strong);
+        color: var(--ink);
+        box-shadow: 0 2px 8px rgba(28, 34, 29, 0.1);
+      }
+      .tab-badge {
+        background: var(--danger-bg);
+        color: var(--danger);
+        padding: 1px 7px;
+        border-radius: var(--radius-pill);
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .tab-badge.ok { background: var(--ok-bg); color: var(--ok); }
+
+      /* ─── Tab views ─── */
+      .tab-view { display: none; }
+      .tab-view.active { display: block; }
+
+      /* ─── Panel ─── */
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-panel);
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex; align-items: center;
+        justify-content: space-between; gap: 10px;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255,255,255,0.45);
+      }
+      .panel-head h2 { font-size: 15px; font-weight: 600; }
+      .panel-head p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+      .panel-count {
+        padding: 4px 10px; border-radius: var(--radius-pill);
+        background: var(--surface-soft); border: 1px solid var(--line);
+        font-size: 12px; color: var(--muted); white-space: nowrap;
+      }
+      .panel-body { padding: 14px; }
+      .panel-scroll { max-height: 560px; overflow-y: auto; padding: 14px; }
+      .panel-scroll::-webkit-scrollbar { width: 4px; }
+      .panel-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+
+      /* ─── Opportunity card ─── */
+      .opp-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        padding: 14px;
+        background: var(--surface-strong);
+        cursor: pointer;
+        transition: transform 130ms ease, border-color 130ms ease, box-shadow 130ms ease;
+        margin-bottom: 10px;
+      }
+      .opp-card:last-child { margin-bottom: 0; }
+      .opp-card:hover, .opp-card.active {
+        transform: translateY(-2px);
+        border-color: rgba(29,122,95,0.3);
+        box-shadow: 0 10px 28px rgba(29,122,95,0.07);
+      }
+      .opp-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+      .opp-card-kw { font-size: 15px; font-weight: 600; line-height: 1.3; }
+      .opp-card-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+      .opp-card-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+      .opp-card-stats {
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        gap: 6px; margin-top: 10px;
+      }
+      .mini-stat {
+        background: var(--surface-soft);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        padding: 8px 10px;
+      }
+      .mini-stat label { display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+      .mini-stat strong { display: block; font-size: 15px; margin-top: 2px; }
+
+      /* ─── Badges / chips ─── */
+      .badge {
+        display: inline-flex; align-items: center;
+        padding: 4px 9px; border-radius: var(--radius-pill);
+        font-size: 11px; font-weight: 500; border: none;
+      }
+      .badge-intent { background: var(--accent-bg); color: var(--accent); }
+      .badge-type { background: rgba(194,106,57,0.12); color: #9c4d28; }
+      .badge-role { background: var(--amber-bg); color: var(--amber); }
+      .badge-score { background: var(--surface-soft); color: var(--ink); border: 1px solid var(--line); }
+      .badge-high { background: var(--ok-bg); color: var(--ok); }
+      .badge-medium { background: var(--amber-bg); color: var(--amber); }
+      .badge-low { background: var(--danger-bg); color: var(--danger); }
+      .badge-review { background: var(--danger-bg); color: var(--danger); }
+      .badge-pass { background: var(--ok-bg); color: var(--ok); }
+      .badge-fail { background: var(--danger-bg); color: var(--danger); }
+      .badge-llm { background: rgba(100,80,200,0.1); color: #5040a0; }
+
+      /* ─── Strategy queue item ─── */
+      .strat-item {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        padding: 14px;
+        background: rgba(255,255,255,0.6);
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: border-color 130ms ease;
+      }
+      .strat-item:last-child { margin-bottom: 0; }
+      .strat-item:hover, .strat-item.active { border-color: rgba(29,122,95,0.3); }
+      .strat-item-rank {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 24px; height: 24px; border-radius: 8px;
+        background: var(--accent-bg); color: var(--accent);
+        font-size: 11px; font-weight: 700; flex-shrink: 0;
+        margin-right: 8px;
+      }
+      .strat-item-kw { font-size: 14px; font-weight: 600; }
+      .strat-item-why { font-size: 12px; color: var(--muted); margin-top: 7px; line-height: 1.55; }
+      .strat-item-action {
+        display: inline-block; margin-top: 8px;
+        font-size: 11px; font-weight: 500;
+        color: var(--accent);
+        background: var(--accent-bg);
+        padding: 4px 10px; border-radius: var(--radius-pill);
+      }
+
+      /* ─── Production panel ─── */
+      .prod-detail { padding: 18px; }
+      .prod-kw { font-size: 26px; font-weight: 700; line-height: 1.1; }
+      .prod-desc { font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.55; }
+      .prod-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+      .prod-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+      .prod-section-label {
+        font-size: 10px; text-transform: uppercase;
+        letter-spacing: 0.1em; color: var(--muted);
+        margin-bottom: 8px; font-weight: 500;
+      }
+      .prod-section p, .prod-section li {
+        font-size: 13px; line-height: 1.6; color: var(--ink);
+      }
+      ul { padding-left: 16px; }
+      textarea {
+        width: 100%; min-height: 110px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        padding: 12px; background: #fffcf6;
+        color: var(--ink); font: 13px/1.6 inherit;
+        resize: vertical;
+      }
+      .qa-box {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        padding: 12px;
+        background: var(--surface-soft);
+        font-size: 13px;
+      }
+      .qa-box.pass { background: var(--ok-bg); border-color: rgba(44,127,82,0.2); }
+      .qa-box.fail { background: var(--danger-bg); border-color: rgba(178,72,63,0.2); }
+
+      /* ─── State flow ─── */
+      .state-flow {
+        display: flex; align-items: center; gap: 0;
+        flex-wrap: nowrap; overflow-x: auto;
+        padding: 12px 0;
+      }
+      .state-step {
+        display: flex; align-items: center;
+        padding: 6px 12px; border-radius: var(--radius-pill);
+        font-size: 11px; font-weight: 500;
+        color: var(--muted);
+        background: var(--surface-soft);
+        border: 1px solid var(--line);
+        white-space: nowrap;
+      }
+      .state-step.done { background: var(--ok-bg); color: var(--ok); border-color: rgba(44,127,82,0.2); }
+      .state-step.current { background: var(--accent-bg); color: var(--accent); border-color: rgba(29,122,95,0.25); font-weight: 600; }
+      .state-step.fail { background: var(--danger-bg); color: var(--danger); border-color: rgba(178,72,63,0.2); }
+      .state-arrow { font-size: 10px; color: var(--muted); padding: 0 4px; flex-shrink: 0; }
+
+      /* ─── Buttons ─── */
+      button {
+        border: 0; cursor: pointer; font: inherit;
+        border-radius: var(--radius-pill);
+        padding: 9px 16px; font-size: 13px;
+        transition: opacity 120ms ease;
+      }
+      button:hover { opacity: 0.85; }
+      .btn-primary { background: var(--accent); color: #fff; }
+      .btn-secondary { background: var(--surface-soft); color: var(--ink); border: 1px solid var(--line); }
+      .btn-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(178,72,63,0.2); }
+      .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+      /* ─── Pipeline 3-col layout ─── */
+      .pipeline-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr 1.1fr;
+        gap: 16px;
+      }
+
+      /* ─── Browse layout ─── */
+      .browse-grid {
+        display: grid;
+        grid-template-columns: 260px 1fr 340px;
+        gap: 16px;
+      }
+
+      /* ─── Filter sidebar ─── */
+      .filter-group { margin-bottom: 16px; }
+      .filter-label {
+        display: block; font-size: 10px; text-transform: uppercase;
+        letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; font-weight: 500;
+      }
+      .filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+      .filter-chip {
+        padding: 6px 11px; border-radius: var(--radius-pill);
+        font-size: 12px; background: var(--surface-soft);
+        border: 1px solid var(--line); cursor: pointer;
+        transition: all 120ms ease; font-family: inherit;
+        color: var(--muted);
+      }
+      .filter-chip:hover { border-color: rgba(29,122,95,0.3); color: var(--ink); }
+      .filter-chip.active { background: var(--accent-bg); color: var(--accent); border-color: rgba(29,122,95,0.25); }
+
+      /* ─── Review queue ─── */
+      .review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .review-item {
+        border: 1px solid rgba(178,72,63,0.18);
+        border-radius: var(--radius-md);
+        padding: 16px;
+        background: rgba(255,252,250,0.9);
+      }
+      .review-kw { font-size: 15px; font-weight: 600; }
+      .review-reason { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.55; }
+      .review-fix {
+        margin-top: 10px; padding: 10px 12px;
+        background: var(--surface-soft); border-radius: var(--radius-sm);
+        font-size: 12px; line-height: 1.55;
+      }
+      .review-fix strong { color: var(--amber); display: block; margin-bottom: 3px; }
+      .review-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+      /* ─── Divider ─── */
+      .section-divider { margin: 16px 0; border: none; border-top: 1px solid var(--line); }
+
+      /* ─── Placeholder ─── */
+      .placeholder {
+        padding: 32px 20px; text-align: center;
+        color: var(--muted); font-size: 13px; line-height: 1.7;
+      }
+
+      /* ─── Detail grid ─── */
+      .detail-grid {
+        display: grid; grid-template-columns: repeat(2, 1fr);
+        gap: 8px; margin-top: 12px;
+      }
+
+      /* ─── Responsive ─── */
+      @media (max-width: 1200px) {
+        .pipeline-grid, .browse-grid { grid-template-columns: 1fr; }
+        .review-grid { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 720px) {
+        .shell { padding: 14px; }
+        .opp-card-stats { grid-template-columns: repeat(2, 1fr); }
+        .topbar { flex-wrap: wrap; }
+        .detail-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+
+      <!-- Top bar -->
+      <header class="topbar">
+        <div class="topbar-brand">
+          <div class="topbar-logo">S</div>
+          <div>
+            <div class="topbar-title">SEO Opportunity Workspace</div>
+            <div class="topbar-sub">Notion → Opportunity → Strategy → Production</div>
+          </div>
+        </div>
+        <div class="topbar-stats">
+          <div class="stat-pill"><strong>24</strong><span>page groups</span></div>
+          <div class="stat-pill"><strong>7</strong><span>high priority</span></div>
+          <div class="stat-pill"><strong>3</strong><span>in production</span></div>
+          <div class="stat-pill"><strong>4</strong><span>needs review</span></div>
+          <div class="stat-pill" style="color:var(--muted)">Demo dataset</div>
+        </div>
+      </header>
+
+      <!-- Nav tabs -->
+      <nav class="nav-tabs" aria-label="workspace views">
+        <button class="nav-tab active" data-tab="pipeline">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="2" width="4" height="12" rx="1.5"/><rect x="6" y="2" width="4" height="12" rx="1.5"/><rect x="11" y="2" width="4" height="12" rx="1.5"/></svg>
+          Pipeline
+        </button>
+        <button class="nav-tab" data-tab="browse">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M10 10l3.5 3.5"/></svg>
+          Browse
+        </button>
+        <button class="nav-tab" data-tab="review">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2v8M8 13v1"/><circle cx="8" cy="8" r="7"/></svg>
+          Needs Review
+          <span class="tab-badge" id="reviewBadge">4</span>
+        </button>
+      </nav>
+
+      <!-- ═════════════ Tab: Pipeline ═════════════ -->
+      <div class="tab-view active" id="tab-pipeline">
+        <div class="pipeline-grid">
+
+          <!-- Column 1: Opportunity Inbox -->
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>1 · Opportunity Inbox</h2>
+                <p>按 same_page_group_id 聚合 · 点卡片可进入生产</p>
+              </div>
+              <span class="panel-count" id="oppCount">6 groups</span>
+            </div>
+            <div class="panel-scroll" id="opportunityList"></div>
+          </article>
+
+          <!-- Column 2: Strategy Queue -->
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>2 · Strategy Queue</h2>
+                <p>规则打分 + why now 解释</p>
+              </div>
+              <span class="panel-count">This week</span>
+            </div>
+            <div class="panel-scroll" id="strategyQueue"></div>
+          </article>
+
+          <!-- Column 3: Production Panel -->
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>3 · Production Panel</h2>
+                <p>brief_v2 · article_draft · QA · export</p>
+              </div>
+              <span class="panel-count" id="prodGroupLabel">—</span>
+            </div>
+            <div id="productionPanel" style="max-height:600px;overflow-y:auto;">
+              <div class="placeholder">← 点击左侧机会或队列项进入生产面板</div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <!-- ═════════════ Tab: Browse ═════════════ -->
+      <div class="tab-view" id="tab-browse">
+        <div class="browse-grid">
+
+          <!-- Filter sidebar -->
+          <aside class="panel">
+            <div class="panel-head"><div><h2>Filters</h2><p>先筛机会，再做判断</p></div></div>
+            <div class="panel-body">
+              <div class="filter-group">
+                <span class="filter-label">Priority</span>
+                <div class="filter-chips">
+                  <button class="filter-chip active" data-filter="priority" data-val="all">All</button>
+                  <button class="filter-chip" data-filter="priority" data-val="high">High</button>
+                  <button class="filter-chip" data-filter="priority" data-val="medium">Medium</button>
+                  <button class="filter-chip" data-filter="priority" data-val="low">Low</button>
+                </div>
+              </div>
+              <div class="filter-group">
+                <span class="filter-label">Content Type</span>
+                <div class="filter-chips">
+                  <button class="filter-chip active" data-filter="type" data-val="all">All</button>
+                  <button class="filter-chip" data-filter="type" data-val="feature">feature</button>
+                  <button class="filter-chip" data-filter="type" data-val="model">model</button>
+                  <button class="filter-chip" data-filter="type" data-val="use-case">use-case</button>
+                  <button class="filter-chip" data-filter="type" data-val="blog">blog</button>
+                  <button class="filter-chip" data-filter="type" data-val="compare">compare</button>
+                </div>
+              </div>
+              <div class="filter-group">
+                <span class="filter-label">Intent</span>
+                <div class="filter-chips">
+                  <button class="filter-chip active" data-filter="intent" data-val="all">All</button>
+                  <button class="filter-chip" data-filter="intent" data-val="transactional">transactional</button>
+                  <button class="filter-chip" data-filter="intent" data-val="commercial">commercial</button>
+                  <button class="filter-chip" data-filter="intent" data-val="informational">informational</button>
+                </div>
+              </div>
+              <div class="filter-group">
+                <span class="filter-label">Internal Link Role</span>
+                <div class="filter-chips">
+                  <button class="filter-chip active" data-filter="role" data-val="all">All</button>
+                  <button class="filter-chip" data-filter="role" data-val="pillar-page">pillar-page</button>
+                  <button class="filter-chip" data-filter="role" data-val="supporting-page">supporting-page</button>
+                </div>
+              </div>
+              <hr class="section-divider">
+              <div class="filter-group">
+                <span class="filter-label">Sort by</span>
+                <div class="filter-chips">
+                  <button class="filter-chip active" data-filter="sort" data-val="score">Score</button>
+                  <button class="filter-chip" data-filter="sort" data-val="volume">Volume</button>
+                  <button class="filter-chip" data-filter="sort" data-val="kd">KD ↑</button>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Opportunity list -->
+          <main class="panel">
+            <div class="panel-head">
+              <div><h2>Opportunity List</h2><p>默认按 score 降序</p></div>
+              <span class="panel-count" id="browseCount">— items</span>
+            </div>
+            <div class="panel-scroll" id="browseList"></div>
+          </main>
+
+          <!-- Detail panel -->
+          <aside class="panel">
+            <div class="panel-head"><div><h2>Opportunity Detail</h2><p>点一条机会后展开完整判断信息</p></div></div>
+            <div id="browseDetail" style="max-height:600px;overflow-y:auto;">
+              <div class="placeholder">← 点击左侧机会查看详情</div>
+            </div>
+          </aside>
+
+        </div>
+      </div>
+
+      <!-- ═════════════ Tab: Needs Review ═════════════ -->
+      <div class="tab-view" id="tab-review">
+        <div class="panel" style="margin-bottom:16px">
+          <div class="panel-head">
+            <div>
+              <h2>Needs Review Lane</h2>
+              <p>这些机会不会自动进入生产，必须经过人工确认</p>
+            </div>
+            <span class="panel-count" id="reviewCount">4 items</span>
+          </div>
+          <div class="panel-body" style="background:rgba(178,72,63,0.03);">
+            <p style="font-size:12px;color:var(--muted);line-height:1.7;padding:4px 0 12px;">
+              系统将 <code>same_page_group_id</code> 缺失、<code>content_type</code> 与 <code>content_type_llm</code> 均无效的机会自动标记为 <code>needs_review</code>，隔离到此队列。人工操作：指定 <code>content_type</code> / 补 <code>same_page_group_id</code> / 标记 skip。
+            </p>
+            <div class="review-grid" id="reviewList"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div><h2>LLM Fallback Items</h2><p>content_type 来自 content_type_llm，建议人工核查</p></div>
+            <span class="panel-count" id="llmCount">— items</span>
+          </div>
+          <div class="panel-scroll" id="llmList"></div>
+        </div>
+      </div>
+
+    </div><!-- /shell -->
+
+    <script>
+// ─────────────────────────────────────────
+// Mock dataset
+// ─────────────────────────────────────────
+const opportunities = [
+  {
+    groupId: "104",
+    mainKeyword: "ai photo editor for ecommerce",
+    topicClusterName: "AI Editing Workflow",
+    intent: "commercial",
+    contentType: "feature",
+    contentTypeSource: "content_type",
+    internalLinkRole: "pillar-page",
+    volume: 5400, kd: 19, variantCount: 12,
+    pageBrief: "Position Pexo as an ecommerce-focused AI photo editor. Highlight bulk editing, background cleanup, and conversion-oriented use cases.",
+    allKeywords: "ai photo editor for ecommerce, product photo retouch ai, ecommerce image editor, product background remover ai",
+    whyNow: "Commercial intent is clear, KD is manageable at 19, and this page can anchor internal links from supporting workflow content. page_brief already exists — production cost is low.",
+    recommendedAction: "Build as a core feature landing page. Use as this week's highest-priority production task.",
+    priorityBand: "high", score: 92,
+    pipelineStatus: "in_production",
+    productionStage: "qa",
+    needsReview: false,
+    briefV2: "Goal: win feature-intent traffic from sellers needing AI editing for catalog images.\n\nStructure:\n1. Problem framing — the cost of inconsistent product photos\n2. Feature proof — bulk cleanup, background removal, one-click retouching\n3. Workflow screenshots (3–4 callouts)\n4. Comparison block vs. manual editing\n5. CTA toward free trial or product demo",
+    articleDraft: "# AI Photo Editor for Ecommerce\n\nPexo helps ecommerce teams turn inconsistent product photos into clean, conversion-ready assets — at scale.\n\n## Why Product Photo Quality Directly Affects Conversion\n\nShoppers make decisions in under 200ms based on product visuals...",
+    qa: { passed: true, issues: ["Need 2 concrete product screenshots before publish.", "CTA copy could be more specific to ecommerce sellers."] }
+  },
+  {
+    groupId: "112",
+    mainKeyword: "virtual try on api",
+    topicClusterName: "Virtual Try-On",
+    intent: "transactional",
+    contentType: "model",
+    contentTypeSource: "content_type",
+    internalLinkRole: "pillar-page",
+    volume: 2900, kd: 27, variantCount: 8,
+    pageBrief: "Explain the API value proposition for teams integrating virtual try-on into commerce or fashion workflows.",
+    allKeywords: "virtual try on api, try on api for ecommerce, fashion virtual try on sdk, virtual fitting room api",
+    whyNow: "High business intent and strong alignment with product value outweigh the moderate difficulty. Suitable for demo-led CTA targeting technical buyers.",
+    recommendedAction: "Create a model/API page with a strong technical evaluation angle and clear conversion CTA.",
+    priorityBand: "high", score: 84,
+    pipelineStatus: "in_production",
+    productionStage: "draft",
+    needsReview: false,
+    briefV2: "Angle: technical buyers evaluating integration options.\n\nMust include:\n- Response quality metrics\n- Latency benchmarks\n- Implementation flow (SDK quickstart)\n- Sample applications in fashion/commerce\n- Pricing tier reference",
+    articleDraft: "# Virtual Try-On API\n\nFor product teams evaluating virtual try-on infrastructure, the decision is rarely about novelty. It is about output consistency, implementation effort, and shopper confidence...",
+    qa: { passed: false, issues: ["Need API call example block.", "Opening section reads too blog-like — should lead with integration value.", "Missing latency benchmark data."] }
+  },
+  {
+    groupId: "128",
+    mainKeyword: "how to generate model shots with ai",
+    topicClusterName: "AI Model Content",
+    intent: "informational",
+    contentType: "blog",
+    contentTypeSource: "content_type",
+    internalLinkRole: "supporting-page",
+    volume: 7200, kd: 14, variantCount: 16,
+    pageBrief: "Teach users how to produce AI model shots, then route them to product pages for workflow execution.",
+    allKeywords: "how to generate model shots with ai, ai model photography workflow, ai fashion model generator, virtual model photo creator",
+    whyNow: "Traffic upside is the highest in this batch and difficulty is very low at 14. Best used as a supporting acquisition page feeding the pillar and feature pages.",
+    recommendedAction: "Ship as a supporting blog page with internal links to the feature and model conversion flows.",
+    priorityBand: "medium", score: 76,
+    pipelineStatus: "in_queue",
+    productionStage: "brief",
+    needsReview: false,
+    briefV2: "Frame as a tactical guide. Step-based workflow, sample prompts, pitfalls, and internal links to product pages.\n\nH2 outline:\n1. What AI model shot generation can (and can't) do\n2. Step-by-step workflow (source image → style → output)\n3. Common mistakes and how to avoid them\n4. Internal link to feature and model pages",
+    articleDraft: "# How to Generate Model Shots With AI\n\nGenerating believable model shots with AI starts with choosing the right source image quality and a workflow that preserves product details...",
+    qa: { passed: true, issues: ["Add one stronger proof point for ecommerce teams."] }
+  },
+  {
+    groupId: "135",
+    mainKeyword: "pexo vs runway ml",
+    topicClusterName: "Comparison Pages",
+    intent: "commercial",
+    contentType: "compare",
+    contentTypeSource: "content_type",
+    internalLinkRole: "supporting-page",
+    volume: 1800, kd: 22, variantCount: 5,
+    pageBrief: "Help users comparing Pexo and Runway understand key differentiators. Focus on ecommerce use cases and workflow integration.",
+    allKeywords: "pexo vs runway, pexo vs runway ml, ai video tool comparison, runway alternative",
+    whyNow: "Comparison pages convert well and this keyword has commercial intent. Low variant count means we can produce quickly without over-engineering.",
+    recommendedAction: "Build a comparison page with feature table, use case matrix, and CTA toward trial.",
+    priorityBand: "medium", score: 71,
+    pipelineStatus: "inbox",
+    productionStage: "none",
+    needsReview: false,
+    briefV2: "", articleDraft: "",
+    qa: { passed: false, issues: [] }
+  },
+  {
+    groupId: "141",
+    mainKeyword: "ai ugc video creator",
+    topicClusterName: "UGC & Social",
+    intent: "commercial",
+    contentType: "use-case",
+    contentTypeSource: "content_type",
+    internalLinkRole: "supporting-page",
+    volume: 3100, kd: 31, variantCount: 9,
+    pageBrief: "Target DTC brands and agencies looking for AI-powered UGC video creation tools.",
+    allKeywords: "ai ugc video creator, ugc video generator ai, ai user generated content video, ugc ad creator",
+    whyNow: "UGC video is a hot category but KD is higher. Good second-week candidate once pillar pages are in place.",
+    recommendedAction: "Queue for second week. Use pillar page internal links to boost this page once live.",
+    priorityBand: "medium", score: 68,
+    pipelineStatus: "inbox",
+    productionStage: "none",
+    needsReview: false,
+    briefV2: "", articleDraft: "",
+    qa: { passed: false, issues: [] }
+  },
+  {
+    groupId: "147",
+    mainKeyword: "best ai video tools for small business",
+    topicClusterName: "AI Editing Workflow",
+    intent: "informational",
+    contentType: "blog",
+    contentTypeSource: "content_type",
+    internalLinkRole: "supporting-page",
+    volume: 9400, kd: 11, variantCount: 21,
+    pageBrief: "Broad awareness blog targeting small business owners evaluating AI video tools.",
+    allKeywords: "best ai video tools for small business, ai video for small biz, small business video maker ai",
+    whyNow: "Extremely high volume and very low KD make this a strong traffic opportunity. Good for long-tail capture and internal linking hub.",
+    recommendedAction: "Write as a round-up blog with internal links to feature and use-case pages.",
+    priorityBand: "high", score: 89,
+    pipelineStatus: "in_queue",
+    productionStage: "none",
+    needsReview: false,
+    briefV2: "", articleDraft: "",
+    qa: { passed: false, issues: [] }
+  }
+];
+
+// Needs review items (missing groupId or contentType)
+const reviewItems = [
+  {
+    groupId: "nr-01",
+    mainKeyword: "free ai video editor",
+    reason: "content_type 与 content_type_llm 均为空，无法确定页面类型",
+    suggestedFix: "建议指定为 feature 或 blog；如果是功能落地页则用 feature，如果是对比内容则用 blog",
+    volume: 6800, kd: 18, intent: "informational",
+    status: "needs_content_type"
+  },
+  {
+    groupId: "nr-02",
+    mainKeyword: "ai video background changer",
+    reason: "same_page_group_id 缺失，该词无法归入任何现有页面组",
+    suggestedFix: "确认是否属于 Group 104（AI Editing Workflow），或新建独立页面组",
+    volume: 3200, kd: 24, intent: "commercial",
+    status: "needs_group_id"
+  },
+  {
+    groupId: "nr-03",
+    mainKeyword: "ai product video maker",
+    reason: "content_type 为待分类（unclassified），content_type_llm 给出 use-case 但置信度低",
+    suggestedFix: "查看关键词完整列表后决定；如果主要是功能展示词则用 feature，否则用 use-case",
+    volume: 4100, kd: 29, intent: "commercial",
+    status: "needs_content_type"
+  },
+  {
+    groupId: "nr-04",
+    mainKeyword: "how to use ai for marketing videos",
+    reason: "same_page_group_id 与 Group 141 有部分重叠，需要确认是合并还是保留独立",
+    suggestedFix: "与 Group 141（UGC & Social）对比关键词列表，决定是否合并分组",
+    volume: 5600, kd: 16, intent: "informational",
+    status: "needs_group_id"
+  }
+];
+
+// LLM fallback items
+const llmItems = opportunities.filter(o => o.contentTypeSource === "content_type_llm");
+
+// ─────────────────────────────────────────
+// State
+// ─────────────────────────────────────────
+let selectedPipelineId = opportunities[0].groupId;
+let browseSortBy = "score";
+let browseFilters = { priority: "all", type: "all", intent: "all", role: "all" };
+let selectedBrowseId = null;
+
+// ─────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────
+function fmt(n) { return new Intl.NumberFormat().format(n); }
+
+function badgeBand(band) {
+  return `<span class="badge badge-${band}">${band}</span>`;
+}
+function badgeIntent(v) { return `<span class="badge badge-intent">${v}</span>`; }
+function badgeType(v) { return `<span class="badge badge-type">${v}</span>`; }
+function badgeRole(v) { return `<span class="badge badge-role">${v}</span>`; }
+function badgeScore(v) { return `<span class="badge badge-score">score ${v}</span>`; }
+
+function stateStep(label, status) {
+  // status: 'done' | 'current' | 'fail' | ''
+  return `<span class="state-step ${status}">${label}</span>`;
+}
+
+function stageToSteps(opportunity) {
+  const stage = opportunity.productionStage;
+  const qa = opportunity.qa;
+  const stages = ["idle", "brief", "draft", "qa", "exported"];
+  const labels = { idle: "idle", brief: "brief_ready", draft: "draft_ready", qa: qa.passed ? "qa_pass" : "qa_fail", exported: "exported" };
+  const stageIndex = stages.indexOf(stage === "none" ? "idle" : stage);
+  return stages.map((s, i) => {
+    let cls = "";
+    if (i < stageIndex) cls = "done";
+    else if (i === stageIndex && s !== "idle") {
+      cls = (s === "qa" && !qa.passed) ? "fail" : "current";
+    }
+    return stateStep(labels[s], cls);
+  }).join('<span class="state-arrow">›</span>');
+}
+
+// ─────────────────────────────────────────
+// Pipeline: Opportunity List
+// ─────────────────────────────────────────
+function renderOpportunityList() {
+  const list = document.getElementById("opportunityList");
+  const count = document.getElementById("oppCount");
+  const eligible = opportunities.filter(o => !o.needsReview);
+  count.textContent = `${eligible.length} groups`;
+
+  list.innerHTML = eligible.map(o => `
+    <div class="opp-card ${o.groupId === selectedPipelineId ? "active" : ""}" data-pipeline-id="${o.groupId}">
+      <div class="opp-card-top">
+        <div>
+          <div class="opp-card-kw">${o.mainKeyword}</div>
+          <div class="opp-card-sub">Group ${o.groupId} · ${o.topicClusterName}</div>
+        </div>
+        ${badgeBand(o.priorityBand)}
+      </div>
+      <div class="opp-card-badges">
+        ${badgeIntent(o.intent)} ${badgeType(o.contentType)} ${badgeRole(o.internalLinkRole)} ${badgeScore(o.score)}
+      </div>
+      <div class="opp-card-stats">
+        <div class="mini-stat"><label>Volume</label><strong>${fmt(o.volume)}</strong></div>
+        <div class="mini-stat"><label>KD</label><strong>${o.kd}</strong></div>
+        <div class="mini-stat"><label>Variants</label><strong>${o.variantCount}</strong></div>
+      </div>
+    </div>
+  `).join("");
+
+  list.querySelectorAll(".opp-card").forEach(el => {
+    el.addEventListener("click", () => {
+      selectedPipelineId = el.dataset.pipelineId;
+      renderOpportunityList();
+      renderStrategyQueue();
+      renderProductionPanel();
+    });
+  });
+}
+
+// ─────────────────────────────────────────
+// Pipeline: Strategy Queue
+// ─────────────────────────────────────────
+function renderStrategyQueue() {
+  const sorted = [...opportunities].filter(o => !o.needsReview).sort((a, b) => b.score - a.score);
+  document.getElementById("strategyQueue").innerHTML = sorted.map((o, i) => `
+    <div class="strat-item ${o.groupId === selectedPipelineId ? "active" : ""}" data-strategy-id="${o.groupId}">
+      <div style="display:flex;align-items:center;">
+        <span class="strat-item-rank">${i + 1}</span>
+        <div>
+          ${badgeBand(o.priorityBand)} ${badgeIntent(o.intent)} ${badgeType(o.contentType)}
+        </div>
+      </div>
+      <div class="strat-item-kw" style="margin-top:8px;">${o.mainKeyword}</div>
+      <div class="strat-item-why">${o.whyNow}</div>
+      <span class="strat-item-action">${o.recommendedAction.split(".")[0]}.</span>
+    </div>
+  `).join("");
+
+  document.querySelectorAll(".strat-item").forEach(el => {
+    el.addEventListener("click", () => {
+      selectedPipelineId = el.dataset.strategyId;
+      renderOpportunityList();
+      renderStrategyQueue();
+      renderProductionPanel();
+    });
+  });
+}
+
+// ─────────────────────────────────────────
+// Pipeline: Production Panel
+// ─────────────────────────────────────────
+function renderProductionPanel() {
+  const o = opportunities.find(x => x.groupId === selectedPipelineId);
+  document.getElementById("prodGroupLabel").textContent = `Group ${o.groupId}`;
+  const panel = document.getElementById("productionPanel");
+
+  const hasBrief = !!o.briefV2;
+  const hasDraft = !!o.articleDraft;
+  const hasQA = o.productionStage === "qa" || o.productionStage === "done";
+
+  panel.innerHTML = `
+    <div class="prod-detail">
+      <div class="prod-kw">${o.mainKeyword}</div>
+      <p class="prod-desc">${o.recommendedAction}</p>
+
+      <div style="margin-top:12px;">${badgeIntent(o.intent)} ${badgeType(o.contentType)} ${badgeRole(o.internalLinkRole)} ${badgeScore(o.score)}</div>
+
+      <div class="prod-section">
+        <div class="prod-section-label">State Flow</div>
+        <div class="state-flow">${stageToSteps(o)}</div>
+      </div>
+
+      <div class="prod-actions">
+        <button class="btn-primary btn-sm">Generate brief_v2</button>
+        <button class="btn-secondary btn-sm" ${hasBrief ? "" : "disabled style='opacity:0.4'"}>Generate article_draft</button>
+        <button class="btn-secondary btn-sm" ${hasDraft ? "" : "disabled style='opacity:0.4'"}>Run QA</button>
+        <button class="btn-secondary btn-sm" ${hasQA && o.qa.passed ? "" : "disabled style='opacity:0.4'"}>Export Markdown</button>
+      </div>
+
+      <div class="prod-section">
+        <div class="prod-section-label">Strategy Output</div>
+        <ul>
+          <li><strong>Why now:</strong> ${o.whyNow}</li>
+          <li style="margin-top:6px;"><strong>All keywords:</strong> ${o.allKeywords}</li>
+        </ul>
+      </div>
+
+      <div class="prod-section">
+        <div class="prod-section-label">Original Page Brief</div>
+        <p>${o.pageBrief || "<em style='color:var(--muted)'>暂无 brief</em>"}</p>
+      </div>
+
+      ${hasBrief ? `
+      <div class="prod-section">
+        <div class="prod-section-label">brief_v2</div>
+        <textarea>${o.briefV2}</textarea>
+      </div>` : ""}
+
+      ${hasDraft ? `
+      <div class="prod-section">
+        <div class="prod-section-label">article_draft</div>
+        <textarea style="min-height:140px;">${o.articleDraft}</textarea>
+      </div>` : ""}
+
+      ${hasQA ? `
+      <div class="prod-section">
+        <div class="prod-section-label">QA Result</div>
+        <div class="qa-box ${o.qa.passed ? "pass" : "fail"}">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span class="badge ${o.qa.passed ? "badge-pass" : "badge-fail"}">${o.qa.passed ? "Pass" : "Needs revision"}</span>
+          </div>
+          ${o.qa.issues.length ? `<ul>${o.qa.issues.map(i => `<li>${i}</li>`).join("")}</ul>` : "<p>No issues found.</p>"}
+        </div>
+      </div>` : ""}
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────
+// Browse tab
+// ─────────────────────────────────────────
+function getFilteredOpportunities() {
+  return opportunities
+    .filter(o => !o.needsReview)
+    .filter(o => browseFilters.priority === "all" || o.priorityBand === browseFilters.priority)
+    .filter(o => browseFilters.type === "all" || o.contentType === browseFilters.type)
+    .filter(o => browseFilters.intent === "all" || o.intent === browseFilters.intent)
+    .filter(o => browseFilters.role === "all" || o.internalLinkRole === browseFilters.role)
+    .sort((a, b) => {
+      if (browseSortBy === "volume") return b.volume - a.volume;
+      if (browseSortBy === "kd") return a.kd - b.kd;
+      return b.score - a.score;
+    });
+}
+
+function renderBrowseList() {
+  const filtered = getFilteredOpportunities();
+  document.getElementById("browseCount").textContent = `${filtered.length} items`;
+  document.getElementById("browseList").innerHTML = filtered.map(o => `
+    <div class="opp-card ${o.groupId === selectedBrowseId ? "active" : ""}" data-browse-id="${o.groupId}">
+      <div class="opp-card-top">
+        <div>
+          <div class="opp-card-kw">${o.mainKeyword}</div>
+          <div class="opp-card-sub">Group ${o.groupId} · ${o.topicClusterName}</div>
+        </div>
+        ${badgeBand(o.priorityBand)}
+      </div>
+      <div class="opp-card-badges">
+        ${badgeIntent(o.intent)} ${badgeType(o.contentType)} ${badgeRole(o.internalLinkRole)} ${badgeScore(o.score)}
+      </div>
+      <div class="opp-card-stats">
+        <div class="mini-stat"><label>Volume</label><strong>${fmt(o.volume)}</strong></div>
+        <div class="mini-stat"><label>KD</label><strong>${o.kd}</strong></div>
+        <div class="mini-stat"><label>Variants</label><strong>${o.variantCount}</strong></div>
+      </div>
+    </div>
+  `).join("");
+
+  document.querySelectorAll("[data-browse-id]").forEach(el => {
+    el.addEventListener("click", () => {
+      selectedBrowseId = el.dataset.browseId;
+      renderBrowseList();
+      renderBrowseDetail();
+    });
+  });
+}
+
+function renderBrowseDetail() {
+  const el = document.getElementById("browseDetail");
+  if (!selectedBrowseId) {
+    el.innerHTML = '<div class="placeholder">← 点击左侧机会查看详情</div>';
+    return;
+  }
+  const o = opportunities.find(x => x.groupId === selectedBrowseId);
+  el.innerHTML = `
+    <div style="padding:18px;">
+      <div style="font-size:26px;font-weight:700;line-height:1.15;">${o.mainKeyword}</div>
+      <p style="color:var(--muted);font-size:13px;margin-top:6px;line-height:1.6;">
+        这是一个适合做成 <strong>${o.contentType} ${o.internalLinkRole}</strong> 的${o.priorityBand === "high" ? "高价值" : "中等价值"}机会。
+        意图 ${o.intent}，KD ${o.kd}，${o.pageBrief ? "已有 page brief" : "暂无 brief"}。
+      </p>
+
+      <div class="detail-grid">
+        <div class="mini-stat"><label>Page Group</label><strong>${o.groupId}</strong></div>
+        <div class="mini-stat"><label>Intent</label><strong>${o.intent}</strong></div>
+        <div class="mini-stat"><label>Content Type</label><strong>${o.contentType}</strong></div>
+        <div class="mini-stat"><label>Role</label><strong>${o.internalLinkRole.replace("-", " ")}</strong></div>
+        <div class="mini-stat"><label>Volume</label><strong>${fmt(o.volume)}</strong></div>
+        <div class="mini-stat"><label>KD</label><strong>${o.kd}</strong></div>
+      </div>
+
+      <div class="prod-section">
+        <div class="prod-section-label">Why This Opportunity</div>
+        <p>${o.whyNow}</p>
+      </div>
+
+      <div class="prod-section">
+        <div class="prod-section-label">Covered Keywords</div>
+        <p style="color:var(--muted);">${o.allKeywords}</p>
+      </div>
+
+      <div class="prod-section">
+        <div class="prod-section-label">Existing Brief</div>
+        <p>${o.pageBrief || "<em style='color:var(--muted)'>暂无 brief</em>"}</p>
+      </div>
+
+      <div class="prod-section">
+        <div class="prod-section-label">Current Pipeline Status</div>
+        <div style="margin-top:6px;">${stageToSteps(o)}</div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+        <button class="btn-primary btn-sm" onclick="promoteToProduction('${o.groupId}')">Promote to Production</button>
+        <button class="btn-secondary btn-sm">Edit Opportunity</button>
+      </div>
+    </div>
+  `;
+}
+
+function promoteToProduction(groupId) {
+  selectedPipelineId = groupId;
+  switchTab("pipeline");
+  renderOpportunityList();
+  renderStrategyQueue();
+  renderProductionPanel();
+}
+
+// ─────────────────────────────────────────
+// Needs Review tab
+// ─────────────────────────────────────────
+function renderReviewList() {
+  document.getElementById("reviewCount").textContent = `${reviewItems.length} items`;
+  document.getElementById("reviewBadge").textContent = reviewItems.length;
+
+  document.getElementById("reviewList").innerHTML = reviewItems.map(item => `
+    <div class="review-item">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div class="review-kw">${item.mainKeyword}</div>
+        <span class="badge badge-review">${item.status.replace("needs_", "missing ")}</span>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+        ${badgeIntent(item.intent)}
+        <span class="badge badge-score">vol ${fmt(item.volume)}</span>
+        <span class="badge badge-score">KD ${item.kd}</span>
+      </div>
+      <div class="review-reason">${item.reason}</div>
+      <div class="review-fix">
+        <strong>Suggested Fix</strong>
+        ${item.suggestedFix}
+      </div>
+      <div class="review-actions">
+        <button class="btn-primary btn-sm">Assign content_type</button>
+        <button class="btn-secondary btn-sm">Assign group ID</button>
+        <button class="btn-danger btn-sm">Mark skip</button>
+      </div>
+    </div>
+  `).join("");
+
+  // LLM fallback
+  const llm = opportunities.filter(o => o.contentTypeSource === "content_type_llm");
+  document.getElementById("llmCount").textContent = `${llm.length} items`;
+  document.getElementById("llmList").innerHTML = llm.length === 0
+    ? '<div class="placeholder">暂无使用 LLM 兜底的机会</div>'
+    : llm.map(o => `
+      <div class="opp-card">
+        <div class="opp-card-top">
+          <div>
+            <div class="opp-card-kw">${o.mainKeyword}</div>
+            <div class="opp-card-sub">Group ${o.groupId} · content_type_llm used as fallback</div>
+          </div>
+          <span class="badge badge-llm">llm fallback</span>
+        </div>
+        <div class="opp-card-badges">
+          ${badgeIntent(o.intent)} ${badgeType(o.contentType)}
+          <span class="badge badge-score">vol ${fmt(o.volume)}</span>
+        </div>
+      </div>
+    `).join("");
+}
+
+// ─────────────────────────────────────────
+// Tab switching
+// ─────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll(".nav-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+  document.querySelectorAll(".tab-view").forEach(v => v.classList.toggle("active", v.id === `tab-${name}`));
+}
+
+document.querySelectorAll(".nav-tab").forEach(btn => {
+  btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+});
+
+// Filter chips
+document.querySelectorAll(".filter-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    const filter = chip.dataset.filter;
+    const val = chip.dataset.val;
+    if (filter === "sort") {
+      browseSortBy = val;
+    } else {
+      browseFilters[filter] = val;
+    }
+    // deactivate siblings in same filter group
+    chip.closest(".filter-chips").querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    renderBrowseList();
+    renderBrowseDetail();
+  });
+});
+
+// ─────────────────────────────────────────
+// Init
+// ─────────────────────────────────────────
+renderOpportunityList();
+renderStrategyQueue();
+renderProductionPanel();
+renderBrowseList();
+renderReviewList();
+    </script>
+  </body>
+</html>

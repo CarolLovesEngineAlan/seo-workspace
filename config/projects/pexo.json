@@ -1,0 +1,38 @@
+{
+  "_comment": "Pexo 项目配置。切换阶段时只需改 site_stage 和 preset，权重函数自动跟随。",
+  "project": "pexo",
+  "site_stage": "new",
+  "business_type": "saas",
+  "preset": "new-saas",
+
+  "notion_db_id": "PEXO-SEO-KEYWORDS",
+
+  "content_type_scores": {
+    "feature": 1.0,
+    "use-case": 0.90,
+    "model": 0.80,
+    "blog": 0.45
+  },
+
+  "weight_overrides": {
+  },
+
+  "qa_intent_keywords": {
+    "commercial_transactional": [
+      "video", "AI", "generate", "create", "tool", "platform",
+      "integration", "API", "feature", "solution", "automate",
+      "workflow", "agent", "model", "output", "render"
+    ],
+    "informational": [
+      "guide", "how to", "how-to", "learn", "understand",
+      "workflow", "steps", "tutorial", "tips", "best practices",
+      "what is", "overview", "introduction", "examples"
+    ]
+  },
+
+  "_upgrade_path": {
+    "next_stage": "growing",
+    "next_preset": "growing-saas",
+    "trigger": "DA 达到 20+ 或月均自然流量稳定超过 5000"
+  }
+}

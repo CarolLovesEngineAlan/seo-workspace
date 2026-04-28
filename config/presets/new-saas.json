@@ -1,0 +1,31 @@
+{
+  "_preset": "new-saas",
+  "_rationale": "新站 SaaS（0-12 个月）：DA 低，以赢为先。KD 惩罚权重最高，避免浪费资源在打不赢的词上。商业意图页优先，快速证明 SEO 价值。",
+
+  "weights": {
+    "kd_penalty_weight": 0.28,
+    "intent_weight": 0.26,
+    "volume_weight": 0.18,
+    "content_type_weight": 0.13,
+    "internal_link_role_weight": 0.08,
+    "variant_count_weight": 0.05,
+    "brief_readiness_weight": 0.02
+  },
+
+  "intent_scores": {
+    "transactional": 1.0,
+    "commercial": 0.75,
+    "informational": 0.30
+  },
+
+  "internal_link_role_scores": {
+    "pillar-page": 1.0,
+    "supporting-page": 0.55
+  },
+
+  "qa_thresholds": {
+    "keyword_coverage_min": 0.60,
+    "min_word_count": 800,
+    "min_internal_links": 1
+  }
+}

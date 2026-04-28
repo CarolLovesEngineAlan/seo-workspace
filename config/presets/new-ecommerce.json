@@ -1,0 +1,31 @@
+{
+  "_preset": "new-ecommerce",
+  "_rationale": "新站电商：交易意图压倒一切，用户搜索即有购买意愿。KD 惩罚高（新站打不赢强竞品），volume 权重适中（长尾词转化率更高）。",
+
+  "weights": {
+    "intent_weight": 0.32,
+    "kd_penalty_weight": 0.26,
+    "volume_weight": 0.16,
+    "content_type_weight": 0.12,
+    "internal_link_role_weight": 0.07,
+    "variant_count_weight": 0.05,
+    "brief_readiness_weight": 0.02
+  },
+
+  "intent_scores": {
+    "transactional": 1.0,
+    "commercial": 0.65,
+    "informational": 0.20
+  },
+
+  "internal_link_role_scores": {
+    "pillar-page": 1.0,
+    "supporting-page": 0.60
+  },
+
+  "qa_thresholds": {
+    "keyword_coverage_min": 0.55,
+    "min_word_count": 600,
+    "min_internal_links": 1
+  }
+}

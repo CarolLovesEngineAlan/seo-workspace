@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keyword Opportunity View</title>
+    <style>
+      :root {
+        --bg: #f6f0e4;
+        --panel: rgba(255, 251, 244, 0.88);
+        --panel-strong: #fffdf8;
+        --ink: #1e241f;
+        --muted: #626a61;
+        --line: rgba(30, 36, 31, 0.1);
+        --green: #1d7a5f;
+        --orange: #c26a39;
+        --yellow: #b38a18;
+        --red: #b24b42;
+        --shadow: 0 18px 50px rgba(59, 49, 33, 0.12);
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        background:
+          radial-gradient(circle at top left, rgba(179, 138, 24, 0.18), transparent 24%),
+          linear-gradient(180deg, #f2ebdc 0%, #f7f3eb 48%, #f2eee6 100%);
+        color: var(--ink);
+      }
+
+      .page {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .hero {
+        background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(248,240,224,0.86));
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        padding: 24px;
+      }
+
+      .eyebrow {
+        display: inline-block;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--green);
+        background: rgba(29,122,95,0.1);
+        padding: 8px 12px;
+        border-radius: 999px;
+      }
+
+      h1 {
+        margin: 14px 0 10px;
+        font-size: clamp(34px, 5vw, 62px);
+        line-height: 0.95;
+        max-width: 820px;
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 760px;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.5;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 20px;
+      }
+
+      .metric {
+        background: rgba(255,255,255,0.6);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 14px;
+      }
+
+      .metric label {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 28px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 320px 1fr 380px;
+        gap: 18px;
+        margin-top: 20px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .panel-header {
+        padding: 18px 18px 14px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255,255,255,0.45);
+      }
+
+      .panel-header h2 {
+        margin: 0;
+        font-size: 21px;
+      }
+
+      .panel-header p {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .panel-body {
+        padding: 14px;
+      }
+
+      .filter-group { margin-bottom: 16px; }
+      .filter-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip {
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 13px;
+        background: rgba(30,36,31,0.08);
+      }
+
+      .chip.active {
+        background: rgba(29,122,95,0.12);
+        color: var(--green);
+      }
+
+      .opportunity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .opportunity-card {
+        background: var(--panel-strong);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 16px;
+        cursor: pointer;
+        transition: 140ms ease;
+      }
+
+      .opportunity-card.active,
+      .opportunity-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(29,122,95,0.3);
+        box-shadow: 0 12px 26px rgba(29,122,95,0.08);
+      }
+
+      .card-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .card-top h3 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.05;
+      }
+
+      .sub {
+        color: var(--muted);
+        font-size: 14px;
+        margin-top: 6px;
+      }
+
+      .badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .badge {
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .intent { background: rgba(29,122,95,0.12); color: var(--green); }
+      .type { background: rgba(194,106,57,0.12); color: var(--orange); }
+      .role { background: rgba(179,138,24,0.16); color: #7f6512; }
+      .score { background: rgba(30,36,31,0.08); }
+      .high { background: rgba(29,122,95,0.12); color: var(--green); }
+      .medium { background: rgba(179,138,24,0.16); color: #7f6512; }
+      .low { background: rgba(178,75,66,0.12); color: var(--red); }
+
+      .card-grid,
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .stat {
+        padding: 12px;
+        border-radius: 16px;
+        background: rgba(243,239,230,0.9);
+      }
+
+      .stat label {
+        display: block;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+
+      .stat strong {
+        display: block;
+        margin-top: 4px;
+        font-size: 18px;
+      }
+
+      .detail {
+        padding: 18px;
+      }
+
+      .detail h2 {
+        margin: 0;
+        font-size: 34px;
+        line-height: 1;
+      }
+
+      .detail .intro {
+        color: var(--muted);
+        margin-top: 8px;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .section {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+      }
+
+      .section h4 {
+        margin: 0 0 10px;
+        font-size: 12px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .section p, .section li {
+        font-size: 15px;
+        line-height: 1.55;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .action-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .action-card {
+        background: rgba(255,255,255,0.62);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 14px;
+      }
+
+      .action-card strong {
+        display: block;
+        font-size: 18px;
+      }
+
+      .action-card p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .button-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+
+      button {
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 16px;
+        font: inherit;
+      }
+
+      .primary {
+        background: var(--green);
+        color: #fff;
+      }
+
+      .secondary {
+        background: rgba(30,36,31,0.08);
+        color: var(--ink);
+      }
+
+      @media (max-width: 1220px) {
+        .layout { grid-template-columns: 1fr; }
+        .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+
+      @media (max-width: 720px) {
+        .page { padding: 16px; }
+        .metrics,
+        .card-grid,
+        .detail-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <span class="eyebrow">Keyword Opportunity UI</span>
+        <h1>先看机会，再决定这一周写什么。</h1>
+        <p>这个页面专门用来展示“关键词机会”本身。它不是生产面板，而是 SEO 在进入 brief 前的判断界面：值不值得做、为什么现在做、做成什么类型页面、适合当 pillar 还是 supporting。</p>
+        <div class="metrics">
+          <div class="metric"><label>Visible Groups</label><strong>24</strong></div>
+          <div class="metric"><label>High Priority</label><strong>7</strong></div>
+          <div class="metric"><label>Pillar Candidates</label><strong>5</strong></div>
+          <div class="metric"><label>Ready To Produce</label><strong>9</strong></div>
+        </div>
+      </section>
+
+      <section class="layout">
+        <aside class="panel">
+          <div class="panel-header">
+            <h2>Filters</h2>
+            <p>先筛机会，再做判断</p>
+          </div>
+          <div class="panel-body">
+            <div class="filter-group">
+              <label>Priority</label>
+              <div class="chips">
+                <span class="chip active">All</span>
+                <span class="chip">High</span>
+                <span class="chip">Medium</span>
+                <span class="chip">Low</span>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label>Content Type</label>
+              <div class="chips">
+                <span class="chip active">feature</span>
+                <span class="chip">model</span>
+                <span class="chip">use-case</span>
+                <span class="chip">blog</span>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label>Intent</label>
+              <div class="chips">
+                <span class="chip active">commercial</span>
+                <span class="chip">transactional</span>
+                <span class="chip">informational</span>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label>Role</label>
+              <div class="chips">
+                <span class="chip active">pillar-page</span>
+                <span class="chip">supporting-page</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <main class="panel">
+          <div class="panel-header">
+            <h2>Opportunity List</h2>
+            <p>建议默认按 score 降序</p>
+          </div>
+          <div class="panel-body opportunity-list">
+            <article class="opportunity-card active">
+              <div class="card-top">
+                <div>
+                  <h3>ai photo editor for ecommerce</h3>
+                  <div class="sub">Group 104 · AI Editing Workflow</div>
+                </div>
+                <span class="badge high">high</span>
+              </div>
+              <div class="badges">
+                <span class="badge intent">commercial</span>
+                <span class="badge type">feature</span>
+                <span class="badge role">pillar-page</span>
+                <span class="badge score">score 92</span>
+              </div>
+              <div class="card-grid">
+                <div class="stat"><label>Volume</label><strong>5,400</strong></div>
+                <div class="stat"><label>KD</label><strong>19</strong></div>
+                <div class="stat"><label>Variants</label><strong>12</strong></div>
+                <div class="stat"><label>Readiness</label><strong>Brief</strong></div>
+              </div>
+            </article>
+
+            <article class="opportunity-card">
+              <div class="card-top">
+                <div>
+                  <h3>virtual try on api</h3>
+                  <div class="sub">Group 112 · Virtual Try-On</div>
+                </div>
+                <span class="badge high">high</span>
+              </div>
+              <div class="badges">
+                <span class="badge intent">transactional</span>
+                <span class="badge type">model</span>
+                <span class="badge role">pillar-page</span>
+                <span class="badge score">score 84</span>
+              </div>
+              <div class="card-grid">
+                <div class="stat"><label>Volume</label><strong>2,900</strong></div>
+                <div class="stat"><label>KD</label><strong>27</strong></div>
+                <div class="stat"><label>Variants</label><strong>8</strong></div>
+                <div class="stat"><label>Readiness</label><strong>Draft</strong></div>
+              </div>
+            </article>
+
+            <article class="opportunity-card">
+              <div class="card-top">
+                <div>
+                  <h3>how to generate model shots with ai</h3>
+                  <div class="sub">Group 128 · AI Model Content</div>
+                </div>
+                <span class="badge medium">medium</span>
+              </div>
+              <div class="badges">
+                <span class="badge intent">informational</span>
+                <span class="badge type">blog</span>
+                <span class="badge role">supporting-page</span>
+                <span class="badge score">score 76</span>
+              </div>
+              <div class="card-grid">
+                <div class="stat"><label>Volume</label><strong>7,200</strong></div>
+                <div class="stat"><label>KD</label><strong>14</strong></div>
+                <div class="stat"><label>Variants</label><strong>16</strong></div>
+                <div class="stat"><label>Readiness</label><strong>None</strong></div>
+              </div>
+            </article>
+          </div>
+        </main>
+
+        <aside class="panel">
+          <div class="panel-header">
+            <h2>Opportunity Detail</h2>
+            <p>点一条机会后展开完整判断信息</p>
+          </div>
+          <div class="detail">
+            <h2>ai photo editor for ecommerce</h2>
+            <p class="intro">这是一个适合做成 feature pillar page 的高价值机会。商业意图强、关键词难度可接受，而且已有 page brief，适合优先进入生产层。</p>
+
+            <div class="detail-grid">
+              <div class="stat"><label>Same Page Group</label><strong>104</strong></div>
+              <div class="stat"><label>Primary Intent</label><strong>commercial</strong></div>
+              <div class="stat"><label>Content Type</label><strong>feature</strong></div>
+              <div class="stat"><label>Role</label><strong>pillar-page</strong></div>
+            </div>
+
+            <div class="section">
+              <h4>Why This Opportunity Exists</h4>
+              <ul>
+                <li>搜索意图明确，用户在找可落地产品，不是在泛搜概念。</li>
+                <li>难度处于可竞争区间，适合两周内优先推进。</li>
+                <li>可作为上层 pillar page，后续承接 supporting blog 的内链流量。</li>
+              </ul>
+            </div>
+
+            <div class="section">
+              <h4>Covered Keywords</h4>
+              <p>ai photo editor for ecommerce, product photo retouch ai, ecommerce image editor</p>
+            </div>
+
+            <div class="section">
+              <h4>Existing Brief</h4>
+              <p>Position Pexo as an ecommerce-focused AI photo editor. Highlight bulk editing, background cleanup, and conversion-oriented workflows.</p>
+            </div>
+
+            <div class="button-row">
+              <button class="primary">Promote To Production</button>
+              <button class="secondary">Edit Opportunity</button>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,58 @@
+import { useId } from "react";
+import { cn } from "@/lib/utils";
+
+export function BrandMark({
+  className,
+  title = "SEO Opportunity Workspace",
+}: {
+  className?: string;
+  title?: string;
+}) {
+  const id = useId();
+  const tileGradientId = `${id}-tile`;
+  const glowGradientId = `${id}-glow`;
+
+  return (
+    <svg
+      viewBox="0 0 64 64"
+      role="img"
+      aria-label={title}
+      className={cn("shrink-0", className)}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id={tileGradientId} x1="10" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#238B6C" />
+          <stop offset="1" stopColor="#155544" />
+        </linearGradient>
+        <radialGradient id={glowGradientId} cx="0" cy="0" r="1" gradientTransform="translate(21 16) rotate(47) scale(21 19)" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#E8D7A2" stopOpacity="0.86" />
+          <stop offset="1" stopColor="#E8D7A2" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      <rect x="2" y="2" width="60" height="60" rx="19" fill={`url(#${tileGradientId})`} />
+      <rect
+        x="2.5"
+        y="2.5"
+        width="59"
+        height="59"
+        rx="18.5"
+        stroke="#FBF7EA"
+        opacity="0.16"
+      />
+      <circle cx="20" cy="16" r="15" fill={`url(#${glowGradientId})`} />
+
+      <path
+        d="M44 18H27a7 7 0 1 0 0 14h10a7 7 0 1 1 0 14H21"
+        fill="none"
+        stroke="#FBF7EA"
+        strokeWidth="7.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="45" cy="18" r="4.5" fill="#D8B86D" />
+      <circle cx="19" cy="46" r="3.5" fill="#BFE5D8" />
+    </svg>
+  );
+}

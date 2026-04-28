@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assets Management View</title>
+    <style>
+      :root {
+        --bg: #f2ebd8;
+        --panel: rgba(255, 252, 244, 0.9);
+        --panel-strong: #fffdf8;
+        --surface-soft: rgba(244, 240, 230, 0.85);
+        --ink: #1c221d;
+        --muted: #5e6860;
+        --line: rgba(28, 34, 29, 0.1);
+        --green: #1d7a5f;
+        --amber: #b38318;
+        --red: #b2483f;
+        --shadow: 0 20px 60px rgba(44, 38, 22, 0.11);
+        --radius-lg: 24px;
+        --radius-md: 18px;
+        --radius-sm: 12px;
+        --radius-pill: 999px;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(ellipse 60% 40% at 8% 0%, rgba(218,188,96,0.22), transparent),
+          radial-gradient(ellipse 40% 50% at 92% 10%, rgba(29,122,95,0.1), transparent),
+          linear-gradient(180deg, #ede6d0 0%, #f2ebd8 50%, #ede8da 100%);
+      }
+      .shell { max-width: 1540px; margin: 0 auto; padding: 24px; }
+      .topbar, .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+      }
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 16px 22px;
+        margin-bottom: 18px;
+      }
+      .brand-title { font-size: 16px; font-weight: 700; }
+      .brand-sub { margin-top: 4px; font-size: 12px; color: var(--muted); }
+      .nav {
+        display: inline-flex;
+        gap: 6px;
+        background: var(--surface-soft);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-pill);
+        padding: 4px;
+      }
+      .nav span {
+        padding: 8px 14px;
+        border-radius: var(--radius-pill);
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .nav .active {
+        background: var(--panel-strong);
+        color: var(--ink);
+        box-shadow: 0 2px 8px rgba(28,34,29,0.1);
+      }
+      .hero {
+        padding: 20px 22px;
+        margin-bottom: 18px;
+      }
+      .hero h1 { margin: 0; font-size: 34px; }
+      .hero p { margin: 10px 0 0; max-width: 920px; color: var(--muted); line-height: 1.7; }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+      }
+      .metric {
+        background: rgba(255,255,255,0.55);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        padding: 14px;
+      }
+      .metric label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+      .metric strong { display: block; margin-top: 8px; font-size: 24px; }
+      .layout {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 18px;
+      }
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255,255,255,0.45);
+      }
+      .panel-head h2 { margin: 0; font-size: 15px; font-weight: 700; }
+      .panel-head p { margin: 4px 0 0; font-size: 12px; color: var(--muted); }
+      .panel-body { padding: 14px; }
+      .search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.72);
+        border-radius: 16px;
+        padding: 10px 12px;
+      }
+      .search input {
+        width: 100%;
+        border: 0;
+        outline: none;
+        background: transparent;
+        font: inherit;
+      }
+      .tabs, .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+      .chip {
+        padding: 7px 11px;
+        border-radius: var(--radius-pill);
+        background: rgba(28,34,29,0.07);
+        font-size: 12px;
+      }
+      .chip.active { background: rgba(29,122,95,0.12); color: var(--green); }
+      .asset-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+      .asset-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        background: var(--panel-strong);
+        padding: 14px;
+      }
+      .asset-card.active {
+        border-color: rgba(29,122,95,0.32);
+        box-shadow: 0 14px 30px rgba(29,122,95,0.08);
+      }
+      .asset-card h3 { margin: 0; font-size: 15px; }
+      .sub { margin-top: 4px; color: var(--muted); font-size: 12px; }
+      .badges, .action-row, .content-tabs {
+        display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+      }
+      .badge {
+        padding: 5px 9px;
+        border-radius: var(--radius-pill);
+        font-size: 11px;
+      }
+      .intent { background: rgba(29,122,95,0.12); color: var(--green); }
+      .type { background: rgba(194,106,57,0.12); color: #9c4d28; }
+      .status { background: rgba(179,131,24,0.12); color: var(--amber); }
+      .edited { background: rgba(178,72,63,0.1); color: var(--red); }
+      .detail {
+        padding: 18px;
+      }
+      .detail h2 { margin: 0; font-size: 28px; }
+      .detail .lead { margin-top: 10px; color: var(--muted); line-height: 1.7; }
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 16px;
+      }
+      .stat {
+        background: var(--surface-soft);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 11px;
+      }
+      .stat label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+      .stat strong { display: block; margin-top: 4px; font-size: 15px; }
+      .section {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+      }
+      .section h4 {
+        margin: 0 0 10px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        color: var(--muted);
+      }
+      textarea {
+        width: 100%;
+        min-height: 180px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: #fffcf6;
+        padding: 14px;
+        resize: vertical;
+        font: inherit;
+        line-height: 1.7;
+        color: var(--ink);
+      }
+      .content-tabs .active {
+        background: var(--green);
+        color: white;
+      }
+      .button {
+        border: 0;
+        border-radius: var(--radius-pill);
+        padding: 11px 16px;
+        font: inherit;
+      }
+      .button.primary { background: var(--green); color: white; }
+      .button.secondary { background: rgba(28,34,29,0.08); color: var(--ink); }
+      .qa-box {
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(244,240,230,0.9);
+        padding: 14px;
+      }
+      .qa-box ul { margin: 8px 0 0; padding-left: 18px; }
+      @media (max-width: 1180px) {
+        .layout { grid-template-columns: 1fr; }
+        .hero-grid, .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 720px) {
+        .hero-grid, .summary-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="topbar">
+        <div>
+          <div class="brand-title">SEO Opportunity Workspace</div>
+          <div class="brand-sub">统一导航建议：Home / Workbench / Assets</div>
+        </div>
+        <div class="nav">
+          <span>Home</span>
+          <span>Workbench</span>
+          <span class="active">Assets</span>
+        </div>
+      </div>
+
+      <section class="panel hero">
+        <h1>Assets 不是 Brief 页，而是生产资产管理页。</h1>
+        <p>
+          这个页面统一管理一条机会下的 Brief、Draft 和 QA 状态。主标识从
+          <code>same_page_group_id</code> 切换为 <code>cluster name</code>，让业务侧更容易理解“这条资产属于哪个内容簇”。
+        </p>
+        <div class="hero-grid">
+          <div class="metric"><label>Total Assets</label><strong>28</strong></div>
+          <div class="metric"><label>Brief Only</label><strong>9</strong></div>
+          <div class="metric"><label>Draft Ready</label><strong>11</strong></div>
+          <div class="metric"><label>Needs Review</label><strong>4</strong></div>
+        </div>
+      </section>
+
+      <section class="layout">
+        <aside class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Asset List</h2>
+              <p>按 cluster name 聚合后的生产资产</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="search">
+              <span>⌕</span>
+              <input value="ai" />
+            </div>
+            <div class="tabs">
+              <span class="chip active">All</span>
+              <span class="chip">Brief Only</span>
+              <span class="chip">Draft Ready</span>
+              <span class="chip">Ready to Upload</span>
+            </div>
+            <div class="chips">
+              <span class="chip active">feature</span>
+              <span class="chip">model</span>
+              <span class="chip">blog</span>
+            </div>
+
+            <div class="asset-list">
+              <div class="asset-card active">
+                <h3>AI Editing Workflow</h3>
+                <div class="sub">Main keyword: ai photo editor for ecommerce</div>
+                <div class="badges">
+                  <span class="badge intent">commercial</span>
+                  <span class="badge type">feature</span>
+                  <span class="badge status">draft ready</span>
+                </div>
+                <div class="sub">Updated 2h ago · 1 brief · 1 draft</div>
+              </div>
+
+              <div class="asset-card">
+                <h3>Virtual Try-On</h3>
+                <div class="sub">Main keyword: virtual try on api</div>
+                <div class="badges">
+                  <span class="badge intent">transactional</span>
+                  <span class="badge type">model</span>
+                  <span class="badge status">brief only</span>
+                </div>
+                <div class="sub">Updated 5h ago · 1 brief · no draft</div>
+              </div>
+
+              <div class="asset-card">
+                <h3>AI Model Content</h3>
+                <div class="sub">Main keyword: how to generate model shots with ai</div>
+                <div class="badges">
+                  <span class="badge intent">informational</span>
+                  <span class="badge type">blog</span>
+                  <span class="badge edited">needs review</span>
+                </div>
+                <div class="sub">Updated yesterday · cluster needs review</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Asset Detail</h2>
+              <p>同一条机会下的 Brief / Draft / QA 统一放在一个详情页里</p>
+            </div>
+          </div>
+          <div class="detail">
+            <h2>AI Editing Workflow</h2>
+            <p class="lead">
+              这条资产代表同一个 cluster name 下的生产成果。左边负责查找资产，右边负责 review、修订和导出，不再拆成 Brief 页面和 Draft 页面。
+            </p>
+
+            <div class="summary-grid">
+              <div class="stat"><label>Cluster Name</label><strong>AI Editing Workflow</strong></div>
+              <div class="stat"><label>Main Keyword</label><strong>ai photo editor...</strong></div>
+              <div class="stat"><label>Current Stage</label><strong>draft_ready</strong></div>
+              <div class="stat"><label>Last Updated</label><strong>2h ago</strong></div>
+            </div>
+
+            <div class="section">
+              <h4>Production Context</h4>
+              <div class="badges">
+                <span class="badge intent">commercial</span>
+                <span class="badge type">feature</span>
+                <span class="badge status">pillar-page</span>
+              </div>
+              <p class="lead">
+                这里展示这次生成使用了哪些输入，包括 main keyword、intent、content type、topic cluster、internal link role 和 page brief。
+              </p>
+            </div>
+
+            <div class="section">
+              <h4>Content Assets</h4>
+              <div class="content-tabs">
+                <span class="chip active">Brief</span>
+                <span class="chip">Draft</span>
+                <span class="chip">QA</span>
+              </div>
+              <textarea>Goal:
+Rank "ai photo editor for ecommerce" and convert ecommerce teams evaluating AI editing workflows.
+
+Target reader:
+Ecommerce operators comparing bulk image cleanup and conversion-ready editing tools.
+
+Structure:
+Problem framing -> Feature proof -> Workflow demo -> CTA</textarea>
+              <div class="action-row">
+                <button class="button secondary">Save Brief</button>
+                <button class="button primary">Generate Draft</button>
+              </div>
+            </div>
+
+            <div class="section">
+              <h4>Draft Preview</h4>
+              <textarea># AI Photo Editor for Ecommerce
+
+Pexo helps ecommerce teams turn repetitive product image cleanup into a faster, more conversion-oriented workflow...
+</textarea>
+              <div class="action-row">
+                <button class="button secondary">Save Draft</button>
+                <button class="button secondary">Run QA</button>
+                <button class="button primary">Export Markdown</button>
+              </div>
+            </div>
+
+            <div class="section">
+              <h4>QA & Review</h4>
+              <div class="qa-box">
+                <strong>Status: Pass with minor fixes</strong>
+                <ul>
+                  <li>H1 contains main keyword</li>
+                  <li>Keyword coverage above threshold</li>
+                  <li>Add 1 more internal link placeholder</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </div>
+  </body>
+</html>

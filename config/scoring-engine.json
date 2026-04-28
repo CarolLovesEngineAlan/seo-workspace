@@ -1,0 +1,21 @@
+{
+  "_comment": "通用评分函数 — 所有项目共用，不随项目或阶段变动。只改计算方式，不改业务权重。",
+  "version": "1.0",
+
+  "kd_thresholds": [
+    { "max": 20,  "penalty": 0.00 },
+    { "max": 35,  "penalty": 0.15 },
+    { "max": 50,  "penalty": 0.35 },
+    { "max": 65,  "penalty": 0.55 },
+    { "max": 999, "penalty": 0.80 }
+  ],
+
+  "volume_normalization": "log10",
+  "volume_cap": 50000,
+
+  "variant_count_scale": {
+    "base": 1,
+    "per_variant": 0.08,
+    "cap": 1.0
+  }
+}

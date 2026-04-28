@@ -1,0 +1,31 @@
+{
+  "_preset": "growing-content",
+  "_rationale": "成长期内容站（媒体/工具/导航站）：流量是核心指标，informational 词是主力。KD 惩罚适中，volume 权重最高。pillar 页重要性高于 SaaS，因为内链对内容站排名影响更大。",
+
+  "weights": {
+    "volume_weight": 0.30,
+    "kd_penalty_weight": 0.22,
+    "intent_weight": 0.18,
+    "internal_link_role_weight": 0.12,
+    "content_type_weight": 0.10,
+    "variant_count_weight": 0.06,
+    "brief_readiness_weight": 0.02
+  },
+
+  "intent_scores": {
+    "transactional": 0.80,
+    "commercial": 0.70,
+    "informational": 1.0
+  },
+
+  "internal_link_role_scores": {
+    "pillar-page": 1.0,
+    "supporting-page": 0.50
+  },
+
+  "qa_thresholds": {
+    "keyword_coverage_min": 0.60,
+    "min_word_count": 1200,
+    "min_internal_links": 3
+  }
+}

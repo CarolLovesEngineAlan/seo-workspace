@@ -1,0 +1,31 @@
+{
+  "_preset": "growing-saas",
+  "_rationale": "成长期 SaaS（1-3 年）：有基础权重，KD 容忍度提升。均衡流量和意图，开始主动建 pillar 页结构，支撑内链体系。",
+
+  "weights": {
+    "intent_weight": 0.28,
+    "volume_weight": 0.22,
+    "kd_penalty_weight": 0.22,
+    "content_type_weight": 0.12,
+    "internal_link_role_weight": 0.08,
+    "variant_count_weight": 0.05,
+    "brief_readiness_weight": 0.03
+  },
+
+  "intent_scores": {
+    "transactional": 1.0,
+    "commercial": 0.75,
+    "informational": 0.35
+  },
+
+  "internal_link_role_scores": {
+    "pillar-page": 1.0,
+    "supporting-page": 0.55
+  },
+
+  "qa_thresholds": {
+    "keyword_coverage_min": 0.65,
+    "min_word_count": 1000,
+    "min_internal_links": 2
+  }
+}

@@ -1,0 +1,180 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --radius-lg: var(--radius);
+}
+
+:root {
+  --background: #050b16;
+  --foreground: #f4fbff;
+  --card: rgba(9, 17, 32, 0.88);
+  --card-foreground: #f7fbff;
+  --muted: rgba(18, 31, 57, 0.92);
+  --muted-foreground: #a8bad0;
+  --border: rgba(118, 155, 212, 0.28);
+  --primary: #74e7ff;
+  --primary-foreground: #04111d;
+  --secondary: rgba(23, 43, 77, 0.92);
+  --secondary-foreground: #eef8ff;
+  --destructive: #ff647f;
+  --destructive-foreground: #fff6f8;
+  --radius: 1rem;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family:
+      "SF Pro Display",
+      "SF Pro Text",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+      background-color: #dad9c3;
+  }
+
+  ::selection {
+    background: rgba(29, 122, 95, 0.88);
+    color: #f7fffb;
+  }
+
+  ::-moz-selection {
+    background: rgba(29, 122, 95, 0.88);
+    color: #f7fffb;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  code,
+  pre {
+    font-family:
+      "SFMono-Regular",
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      "Liberation Mono",
+      monospace;
+  }
+
+  a,
+  button,
+  input,
+  textarea,
+  select {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  * {
+    scrollbar-color: rgba(113, 226, 248, 0.26) transparent;
+  }
+
+  code {
+    @apply rounded-md border border-border/80 bg-secondary/70 px-1.5 py-0.5 text-[0.92em] text-foreground;
+  }
+}
+
+@layer utilities {
+  .content-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 720px;
+  }
+
+  .surface-panel {
+    background:
+      linear-gradient(180deg, rgba(10, 18, 35, 0.96) 0%, rgba(6, 12, 25, 0.98) 100%);
+    backdrop-filter: blur(18px);
+    box-shadow:
+      0 24px 80px rgba(2, 7, 17, 0.52),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 0 0 1px rgba(128, 167, 225, 0.08);
+  }
+
+  .surface-soft {
+    background:
+      linear-gradient(180deg, rgba(18, 30, 55, 0.86) 0%, rgba(11, 19, 37, 0.94) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 16px 40px rgba(2, 8, 19, 0.28);
+  }
+
+  .surface-chip {
+    background: rgba(10, 17, 31, 0.72);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 10px 24px rgba(2, 7, 17, 0.18);
+  }
+
+  .future-ring {
+    box-shadow:
+      0 0 0 1px rgba(116, 231, 255, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .future-lift {
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease,
+      background-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .future-lift:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 18px 42px rgba(3, 10, 22, 0.34),
+      0 0 0 1px rgba(116, 231, 255, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .hero-glow {
+    box-shadow:
+      0 28px 90px rgba(2, 8, 21, 0.52),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 0 0 1px rgba(116, 231, 255, 0.12);
+  }
+
+  .text-glow {
+    text-shadow:
+      0 0 22px rgba(116, 231, 255, 0.16),
+      0 0 48px rgba(76, 127, 255, 0.12);
+  }
+}

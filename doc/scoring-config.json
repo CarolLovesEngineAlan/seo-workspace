@@ -1,0 +1,9 @@
+{
+  "_deprecated": true,
+  "_message": "scoring-config.json 已拆分为三层结构，请勿在此文件继续修改权重。",
+  "_redirect": {
+    "通用评分函数": "config/scoring-engine.json",
+    "阶段 × 类型预设权重": "config/presets/",
+    "Pexo 项目配置": "config/projects/pexo.json"
+  }
+}

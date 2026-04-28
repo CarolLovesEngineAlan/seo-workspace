@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SEO Opportunity Workspace MVP Prototype</title>
+    <style>
+      :root {
+        --surface: rgba(255, 250, 241, 0.88);
+        --surface-strong: #fffdf8;
+        --ink: #1f241f;
+        --muted: #5c655d;
+        --line: rgba(31, 36, 31, 0.12);
+        --accent: #1d7a5f;
+        --danger: #b2483f;
+        --ok: #2c7f52;
+        --shadow: 0 24px 70px rgba(56, 48, 34, 0.12);
+        --radius: 22px;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(221, 191, 97, 0.28), transparent 28%),
+          radial-gradient(circle at right 20%, rgba(29, 122, 95, 0.12), transparent 24%),
+          linear-gradient(180deg, #f2ecde 0%, #f7f4ee 40%, #f4f0e7 100%);
+        min-height: 100vh;
+      }
+
+      .shell {
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+
+      .hero {
+        background: linear-gradient(135deg, rgba(255, 253, 248, 0.92), rgba(244, 237, 221, 0.92));
+        border: 1px solid rgba(31, 36, 31, 0.08);
+        border-radius: 30px;
+        box-shadow: var(--shadow);
+        padding: 28px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        right: -80px;
+        top: -70px;
+        width: 240px;
+        height: 240px;
+        border-radius: 50%;
+        background: rgba(216, 108, 61, 0.08);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        gap: 10px;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(29, 122, 95, 0.1);
+        color: var(--accent);
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 16px 0 8px;
+        font-size: clamp(38px, 6vw, 66px);
+        line-height: 0.95;
+        max-width: 900px;
+      }
+
+      .hero p {
+        max-width: 760px;
+        font-size: 18px;
+        line-height: 1.55;
+        color: var(--muted);
+        margin: 10px 0 0;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 22px;
+      }
+
+      .metric,
+      .panel,
+      .card,
+      .queue-item,
+      .stat,
+      textarea,
+      .qa-box {
+        border: 1px solid rgba(31, 36, 31, 0.08);
+      }
+
+      .metric {
+        background: rgba(255, 255, 255, 0.55);
+        border-radius: 20px;
+        padding: 16px;
+      }
+
+      .metric label,
+      .stat label,
+      .section h4 {
+        display: block;
+        font-size: 12px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 28px;
+      }
+
+      .workspace {
+        margin-top: 22px;
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr 1.1fr;
+        gap: 18px;
+      }
+
+      .dev-strip {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: 1.1fr 1fr 1fr;
+        gap: 18px;
+      }
+
+      .panel {
+        background: var(--surface);
+        backdrop-filter: blur(14px);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.46);
+      }
+
+      .panel-header h2,
+      .card h3,
+      .queue-item strong {
+        margin: 0;
+      }
+
+      .panel-header span,
+      .sub,
+      .queue-item p,
+      .detail-head p,
+      .footer-note {
+        color: var(--muted);
+      }
+
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .card {
+        border-radius: 18px;
+        padding: 15px;
+        background: var(--surface-strong);
+        cursor: pointer;
+        transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+      }
+
+      .card:hover,
+      .card.active {
+        transform: translateY(-2px);
+        border-color: rgba(29, 122, 95, 0.35);
+        box-shadow: 0 12px 30px rgba(29, 122, 95, 0.08);
+      }
+
+      .card-top,
+      .detail-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .badges,
+      .chips,
+      .cta-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+
+      .badge,
+      .chip,
+      button {
+        border-radius: 999px;
+        padding: 6px 10px;
+        font: inherit;
+      }
+
+      .badge { font-size: 12px; }
+      .badge.intent { background: rgba(29, 122, 95, 0.11); color: var(--accent); }
+      .badge.type { background: rgba(216, 108, 61, 0.11); color: #9b4d2d; }
+      .badge.role { background: rgba(221, 191, 97, 0.18); color: #7e6413; }
+      .badge.score { background: rgba(31, 36, 31, 0.08); color: var(--ink); }
+      .chip.high { background: rgba(44, 127, 82, 0.12); color: var(--ok); }
+      .chip.medium { background: rgba(221, 191, 97, 0.22); color: #7d6213; }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .stat {
+        padding: 10px;
+        border-radius: 14px;
+        background: rgba(244, 240, 231, 0.9);
+      }
+
+      .stat strong {
+        display: block;
+        margin-top: 4px;
+        font-size: 18px;
+      }
+
+      .queue-item {
+        padding: 14px 15px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.62);
+      }
+
+      .queue-item p,
+      .section p,
+      .section li {
+        line-height: 1.5;
+      }
+
+      .detail {
+        padding: 18px 18px 22px;
+      }
+
+      .detail-head h3 {
+        margin: 0;
+        font-size: 32px;
+        line-height: 1;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+        padding: 12px 18px;
+      }
+
+      .primary { background: var(--accent); color: #fff; }
+      .secondary { background: rgba(31, 36, 31, 0.08); color: var(--ink); }
+
+      .section {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 134px;
+        border-radius: 18px;
+        padding: 14px;
+        background: #fffcf6;
+        color: var(--ink);
+        resize: vertical;
+      }
+
+      .qa-box {
+        border-radius: 18px;
+        padding: 14px;
+        background: rgba(244, 240, 231, 0.9);
+      }
+
+      .qa-box.pass {
+        background: rgba(44, 127, 82, 0.08);
+      }
+
+      .codebox {
+        margin-top: 10px;
+        padding: 14px;
+        border-radius: 18px;
+        background: #222722;
+        color: #f7f2e8;
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 13px;
+        line-height: 1.5;
+        overflow: auto;
+      }
+
+      .flow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .flow span {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(31, 36, 31, 0.08);
+        font-size: 13px;
+      }
+
+      @media (max-width: 1180px) {
+        .workspace,
+        .dev-strip { grid-template-columns: 1fr; }
+        .hero-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+
+      @media (max-width: 720px) {
+        .shell { padding: 16px; }
+        .hero-grid,
+        .stats { grid-template-columns: 1fr; }
+        .detail-head { flex-direction: column; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="eyebrow">MVP Prototype · SEO Opportunity Workspace</div>
+        <h1>把关键词库变成一周内能交付的页面与文章。</h1>
+        <p>
+          这个原型只展示 MVP 最关键的闭环：按页面组聚合关键词机会，给出本周优先级，进入 brief、draft、QA、导出。
+        </p>
+        <div class="hero-grid">
+          <div class="metric"><label>Input Source</label><strong>Notion DB</strong></div>
+          <div class="metric"><label>Production Unit</label><strong>Page Group</strong></div>
+          <div class="metric"><label>Decision Logic</label><strong>Score + Why</strong></div>
+          <div class="metric"><label>Output</label><strong>Brief + Draft</strong></div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>1. Opportunity Inbox</h2>
+              <span>按 same_page_group_id 聚合的页面机会</span>
+            </div>
+            <span id="opportunityCount"></span>
+          </div>
+          <div class="stack" id="opportunityList"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>2. Strategy Queue</h2>
+              <span>规则打分 + AI 解释</span>
+            </div>
+            <span>This Week</span>
+          </div>
+          <div class="stack" id="strategyQueue"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>3. Production Panel</h2>
+              <span>brief_v2 · article_draft · QA</span>
+            </div>
+            <span id="selectedGroup"></span>
+          </div>
+          <div class="detail" id="detailPanel"></div>
+        </article>
+      </section>
+
+      <section class="dev-strip">
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>4. Data Contract</h2>
+              <span>Notion -> Opportunity</span>
+            </div>
+          </div>
+          <div class="detail">
+            <div class="flow">
+              <span>same_page_group_id -> groupId</span>
+              <span>main_keyword -> mainKeyword</span>
+              <span>content_type || content_type_llm -> contentType</span>
+              <span>page_brief -> pageBrief</span>
+            </div>
+            <div class="codebox">type PageOpportunity = {
+  groupId: string;
+  mainKeyword: string;
+  allKeywords: string;
+  intent: "transactional" | "commercial" | "informational";
+  contentType: "feature" | "model" | "blog" | "use-case";
+  volume: number;
+  kd: number;
+  internalLinkRole: "pillar-page" | "supporting-page";
+  pageBrief: string;
+};</div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>5. API Shape</h2>
+              <span>前端先按假接口开发</span>
+            </div>
+          </div>
+          <div class="detail">
+            <div class="codebox">GET /api/opportunities
+-> PageOpportunity[]
+
+GET /api/strategy
+-> StrategyTask[]
+
+POST /api/brief
+body: { groupId }
+-> { briefV2 }
+
+POST /api/draft
+body: { groupId, briefV2 }
+-> { articleDraft, qaResult }</div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>6. State Flow</h2>
+              <span>最小状态机</span>
+            </div>
+          </div>
+          <div class="detail">
+            <div class="flow">
+              <span>idle</span>
+              <span>brief_ready</span>
+              <span>draft_ready</span>
+              <span>qa_pass / qa_fail</span>
+              <span>exported</span>
+            </div>
+            <div class="section">
+              <h4>UI Split</h4>
+              <ul>
+                <li>左栏组件：OpportunityList + OpportunityCard</li>
+                <li>中栏组件：StrategyQueue + StrategyItem</li>
+                <li>右栏组件：ProductionPanel + BriefEditor + DraftEditor + QaBox</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <script>
+      const opportunities = [
+        {
+          groupId: "104",
+          mainKeyword: "ai photo editor for ecommerce",
+          topicClusterName: "AI Editing Workflow",
+          intent: "commercial",
+          contentType: "feature",
+          internalLinkRole: "pillar-page",
+          volume: 5400,
+          kd: 19,
+          readiness: "page_brief exists",
+          pageBrief: "Position Pexo as an ecommerce-focused AI photo editor. Highlight bulk editing, background cleanup, and conversion-oriented use cases.",
+          whyNow: "Commercial intent is clear, difficulty is manageable, and this page can anchor internal links from supporting workflow content.",
+          recommendation: "Build as a core feature landing page and use it as this week’s highest-priority production task.",
+          priorityBand: "high",
+          score: 92,
+          allKeywords: "ai photo editor for ecommerce, product photo retouch ai, ecommerce image editor",
+          briefV2: "Goal: win feature-intent traffic from sellers who need AI editing for catalog images. Structure: problem framing, feature proof, workflow screenshots, comparison block, CTA.",
+          articleDraft: "# AI Photo Editor for Ecommerce\n\nPexo helps ecommerce teams turn inconsistent product photos into clean, conversion-ready assets. Start by showing how bulk cleanup removes repetitive manual work...",
+          qa: { passed: true, issues: ["Need 2 concrete product screenshots before publish."] }
+        },
+        {
+          groupId: "112",
+          mainKeyword: "virtual try on api",
+          topicClusterName: "Virtual Try-On",
+          intent: "transactional",
+          contentType: "model",
+          internalLinkRole: "pillar-page",
+          volume: 2900,
+          kd: 27,
+          readiness: "brief draft only",
+          pageBrief: "Explain the API value proposition for teams integrating virtual try-on into commerce or fashion workflows.",
+          whyNow: "High business intent and strong alignment with product value outweigh the moderate difficulty. Suitable for demo-led CTA.",
+          recommendation: "Create a model/API page with a strong technical evaluation angle and clear conversion CTA.",
+          priorityBand: "high",
+          score: 84,
+          allKeywords: "virtual try on api, try on api for ecommerce, fashion virtual try on sdk",
+          briefV2: "Angle: technical buyers evaluating integration. Must include response quality, latency, implementation flow, and sample applications.",
+          articleDraft: "# Virtual Try-On API\n\nFor product teams evaluating virtual try-on infrastructure, the decision is rarely about novelty. It is about output consistency, implementation effort, and shopper confidence...",
+          qa: { passed: false, issues: ["Need API call example block.", "Intent skew is too blog-like in the opening section."] }
+        },
+        {
+          groupId: "128",
+          mainKeyword: "how to generate model shots with ai",
+          topicClusterName: "AI Model Content",
+          intent: "informational",
+          contentType: "blog",
+          internalLinkRole: "supporting-page",
+          volume: 7200,
+          kd: 14,
+          readiness: "no brief",
+          pageBrief: "Teach users how to produce AI model shots, then route them to product pages for workflow execution.",
+          whyNow: "Traffic upside is high and difficulty is low. Best used as a supporting acquisition page feeding the pillar and feature pages.",
+          recommendation: "Ship as a supporting blog page with internal links to the feature and model conversion flows.",
+          priorityBand: "medium",
+          score: 76,
+          allKeywords: "how to generate model shots with ai, ai model photography workflow, ai fashion model generator",
+          briefV2: "Frame as a tactical guide. Include a step-based workflow, sample prompts, pitfalls, and internal links to product pages.",
+          articleDraft: "# How to Generate Model Shots With AI\n\nGenerating believable model shots with AI starts with choosing the right source image quality and a workflow that preserves product details...",
+          qa: { passed: true, issues: ["Add one stronger proof point for ecommerce teams."] }
+        }
+      ];
+
+      const opportunityList = document.getElementById("opportunityList");
+      const strategyQueue = document.getElementById("strategyQueue");
+      const detailPanel = document.getElementById("detailPanel");
+      const opportunityCount = document.getElementById("opportunityCount");
+      const selectedGroup = document.getElementById("selectedGroup");
+      let selectedId = opportunities[0].groupId;
+
+      function renderOpportunities() {
+        opportunityCount.textContent = `${opportunities.length} groups`;
+        opportunityList.innerHTML = opportunities.map((item) => `
+          <div class="card ${item.groupId === selectedId ? "active" : ""}" data-id="${item.groupId}">
+            <div class="card-top">
+              <div>
+                <h3>${item.mainKeyword}</h3>
+                <div class="sub">Group ${item.groupId} · ${item.topicClusterName}</div>
+              </div>
+              <span class="chip ${item.priorityBand}">${item.priorityBand}</span>
+            </div>
+            <div class="badges">
+              <span class="badge intent">${item.intent}</span>
+              <span class="badge type">${item.contentType}</span>
+              <span class="badge role">${item.internalLinkRole}</span>
+              <span class="badge score">Score ${item.score}</span>
+            </div>
+            <div class="stats">
+              <div class="stat"><label>Volume</label><strong>${item.volume.toLocaleString()}</strong></div>
+              <div class="stat"><label>KD</label><strong>${item.kd}</strong></div>
+              <div class="stat"><label>Readiness</label><strong>${item.readiness}</strong></div>
+            </div>
+          </div>
+        `).join("");
+
+        [...opportunityList.querySelectorAll(".card")].forEach((node) => {
+          node.addEventListener("click", () => {
+            selectedId = node.dataset.id;
+            renderOpportunities();
+            renderDetail();
+          });
+        });
+      }
+
+      function renderStrategy() {
+        strategyQueue.innerHTML = opportunities.slice().sort((a, b) => b.score - a.score).map((item, index) => `
+          <div class="queue-item">
+            <div class="badges">
+              <span class="badge score">#${index + 1}</span>
+              <span class="badge intent">${item.intent}</span>
+              <span class="badge type">${item.contentType}</span>
+            </div>
+            <strong>${item.mainKeyword}</strong>
+            <p>${item.whyNow}</p>
+          </div>
+        `).join("");
+      }
+
+      function renderDetail() {
+        const item = opportunities.find((entry) => entry.groupId === selectedId);
+        selectedGroup.textContent = `Group ${item.groupId}`;
+        detailPanel.innerHTML = `
+          <div class="detail-head">
+            <div>
+              <h3>${item.mainKeyword}</h3>
+              <p>${item.recommendation}</p>
+            </div>
+            <div class="chips">
+              <span class="badge intent">${item.intent}</span>
+              <span class="badge type">${item.contentType}</span>
+              <span class="badge role">${item.internalLinkRole}</span>
+              <span class="badge score">Score ${item.score}</span>
+            </div>
+          </div>
+          <div class="cta-row">
+            <button class="primary">Generate brief_v2</button>
+            <button class="secondary">Generate article_draft</button>
+            <button class="secondary">Export Markdown</button>
+          </div>
+          <div class="section">
+            <h4>Strategy Output</h4>
+            <ul>
+              <li><strong>Why now:</strong> ${item.whyNow}</li>
+              <li><strong>Recommended action:</strong> ${item.recommendation}</li>
+              <li><strong>Covered keywords:</strong> ${item.allKeywords}</li>
+            </ul>
+          </div>
+          <div class="section">
+            <h4>Original Page Brief</h4>
+            <p>${item.pageBrief}</p>
+          </div>
+          <div class="section">
+            <h4>brief_v2</h4>
+            <textarea>${item.briefV2}</textarea>
+          </div>
+          <div class="section">
+            <h4>article_draft</h4>
+            <textarea>${item.articleDraft}</textarea>
+          </div>
+          <div class="section">
+            <h4>QA Result</h4>
+            <div class="qa-box ${item.qa.passed ? "pass" : ""}">
+              <p><strong>Status:</strong> ${item.qa.passed ? "Pass with minor fixes" : "Needs revision"}</p>
+              <ul>${item.qa.issues.map((issue) => `<li>${issue}</li>`).join("")}</ul>
+            </div>
+          </div>
+          <p class="footer-note">Prototype intent: 让 SEO 和前端快速对齐数据单位、策略解释方式、生产面板结构。</p>
+        `;
+      }
+
+      renderOpportunities();
+      renderStrategy();
+      renderDetail();
+    </script>
+  </body>
+</html>
