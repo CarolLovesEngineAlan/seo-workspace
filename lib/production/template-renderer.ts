@@ -131,28 +131,55 @@ function findCtaElement(section: HTMLElement): HTMLElement | null {
 
 function fillItems(section: HTMLElement, items: Json[]): void {
   const itemEls = section.querySelectorAll('[data-pexo-block="item"]');
-  // If there are nested items (e.g. comparison rows), this still works
   itemEls.forEach((el, i) => {
     const item = items[i];
     if (!item || typeof item !== "object") return;
 
-    const title =
-      pickString(item, ["title", "label", "scenario_label", "name", "question", "h3", "h4", "feature_label"]);
+    // Eyebrow / chip label (small label above the title in features cards)
+    const eyebrow = pickString(item, ["eyebrow", "chip", "tag", "kicker", "section_label"]);
+    if (eyebrow) {
+      const eyebrowEl = findEyebrowSpan(el);
+      setText(eyebrowEl, eyebrow);
+    }
+
+    // Title (h3/h4)
+    const title = pickString(item, [
+      "title", "label", "scenario_label", "name",
+      "question", "q",
+      "h3", "h4", "feature_label",
+    ]);
     const titleEl = el.querySelector("h3") ?? el.querySelector("h4");
     setText(titleEl, title);
 
+    // Body (first <p> inside the item)
     const body = pickString(item, [
-      "body",
-      "description",
-      "answer",
-      "scenario_body",
-      "summary",
-      "quote",
-      "text",
+      "body", "description",
+      "answer", "a",
+      "scenario_body", "summary", "quote", "text",
     ]);
     const ps = el.querySelectorAll("p");
     if (ps[0]) setText(ps[0], body);
   });
+}
+
+// Find the eyebrow chip — first <span> inside the item that contains
+// human-readable text (not just whitespace, not inside an SVG).
+function findEyebrowSpan(item: HTMLElement): HTMLElement | null {
+  const spans = item.querySelectorAll("span");
+  for (const sp of spans) {
+    const txt = sp.text?.trim();
+    if (!txt) continue;
+    // Skip spans nested inside an SVG (icon-only)
+    let p: HTMLElement | null = sp.parentNode as HTMLElement | null;
+    let insideSvg = false;
+    while (p) {
+      if (p.tagName?.toLowerCase() === "svg") { insideSvg = true; break; }
+      p = p.parentNode as HTMLElement | null;
+    }
+    if (insideSvg) continue;
+    return sp;
+  }
+  return null;
 }
 
 function buildHtmlDocument(meta: Json | undefined, body: string): string {
