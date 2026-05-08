@@ -79,6 +79,15 @@ function setText(el: HTMLElement | null, text: string | undefined): void {
 }
 
 function fillSection(section: HTMLElement, data: Json): void {
+  // Section-level badge / chip (e.g. hero use_case_label, "Why Pexo", etc.)
+  const badge = pickString(data, [
+    "use_case_label", "badge", "section_label", "eyebrow", "label",
+  ]);
+  if (badge) {
+    const badgeEl = findEyebrowSpan(section);
+    if (badgeEl) setText(badgeEl, badge);
+  }
+
   // Title: h1 → h2 (whichever appears first)
   const heading = section.querySelector("h1") ?? section.querySelector("h2");
   setText(heading, pickString(data, ["h1", "h2", "title", "headline"]));
@@ -134,38 +143,82 @@ function fillItems(section: HTMLElement, items: Json[]): void {
   itemEls.forEach((el, i) => {
     const item = items[i];
     if (!item || typeof item !== "object") return;
-
-    // Eyebrow / chip label (small label above the title in features cards)
-    const eyebrow = pickString(item, [
-      "eyebrow", "eyebrow_label", "chip", "tag", "kicker", "section_label",
-    ]);
-    if (eyebrow) {
-      const eyebrowEl = findEyebrowSpan(el);
-      setText(eyebrowEl, eyebrow);
+    if (isTestimonialItem(item)) {
+      fillTestimonialItem(el, item);
+    } else {
+      fillDefaultItem(el, item);
     }
-
-    // Title (h3/h4)
-    const title = pickString(item, [
-      "title", "label", "scenario_label", "name",
-      "question", "q",
-      "h3", "h4", "feature_label",
-    ]);
-    const titleEl = el.querySelector("h3") ?? el.querySelector("h4");
-    setText(titleEl, title);
-
-    // Body (first <p> inside the item)
-    const body = pickString(item, [
-      "body", "description",
-      "answer", "a",
-      "scenario_body", "summary", "quote", "text",
-    ]);
-    const ps = el.querySelectorAll("p");
-    if (ps[0]) setText(ps[0], body);
-
-    // Optional second <p> — italic "Great for: ..." caption / tag line
-    const tail = pickString(item, ["great_for", "tags", "footnote", "caption"]);
-    if (tail && ps[1]) setText(ps[1], tail);
   });
+}
+
+function isTestimonialItem(item: Json): boolean {
+  // Testimonial cards have name + (quote|role|tags); features have eyebrow_label / h3
+  return typeof item.name === "string" && (
+    typeof item.quote === "string" ||
+    typeof item.role === "string" ||
+    typeof item.tags === "string"
+  );
+}
+
+function fillTestimonialItem(el: HTMLElement, item: Json): void {
+  // Spans inside the card, in document order (skip ones inside SVG)
+  const spans = collectVisibleSpans(el);
+  if (spans[0]) setText(spans[0], pickString(item, ["name"]));
+  if (spans[1]) setText(spans[1], pickString(item, ["role", "title"]));
+  if (spans[2]) setText(spans[2], pickString(item, ["tags"]));
+
+  const ps = el.querySelectorAll("p");
+  if (ps[0]) setText(ps[0], pickString(item, ["quote", "body", "text"]));
+}
+
+function fillDefaultItem(el: HTMLElement, item: Json): void {
+  // Eyebrow / chip label (small label above the title in features cards)
+  const eyebrow = pickString(item, [
+    "eyebrow", "eyebrow_label", "chip", "tag", "kicker", "section_label",
+  ]);
+  if (eyebrow) {
+    const eyebrowEl = findEyebrowSpan(el);
+    setText(eyebrowEl, eyebrow);
+  }
+
+  // Title (h3/h4)
+  const title = pickString(item, [
+    "title", "label", "scenario_label", "name",
+    "question", "q",
+    "h3", "h4", "feature_label",
+  ]);
+  const titleEl = el.querySelector("h3") ?? el.querySelector("h4");
+  setText(titleEl, title);
+
+  // Body (first <p> inside the item)
+  const body = pickString(item, [
+    "body", "description",
+    "answer", "a",
+    "scenario_body", "summary", "quote", "text",
+  ]);
+  const ps = el.querySelectorAll("p");
+  if (ps[0]) setText(ps[0], body);
+
+  // Optional second <p> — italic "Great for: ..." caption / tag line
+  const tail = pickString(item, ["great_for", "tags", "footnote", "caption"]);
+  if (tail && ps[1]) setText(ps[1], tail);
+}
+
+function collectVisibleSpans(root: HTMLElement): HTMLElement[] {
+  const out: HTMLElement[] = [];
+  for (const sp of root.querySelectorAll("span")) {
+    const txt = sp.text?.trim();
+    if (!txt) continue;
+    let p: HTMLElement | null = sp.parentNode as HTMLElement | null;
+    let insideSvg = false;
+    while (p) {
+      if (p.tagName?.toLowerCase() === "svg") { insideSvg = true; break; }
+      p = p.parentNode as HTMLElement | null;
+    }
+    if (insideSvg) continue;
+    out.push(sp);
+  }
+  return out;
 }
 
 // Find the eyebrow chip — first <span> inside the item that contains
