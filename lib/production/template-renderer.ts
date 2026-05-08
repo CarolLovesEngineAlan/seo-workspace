@@ -195,13 +195,16 @@ function fillDefaultItem(el: HTMLElement, item: Json): void {
     setText(eyebrowEl, eyebrow);
   }
 
-  // Title (h3/h4)
+  // Title (h3/h4, or the first span inside <summary> for FAQ <details>)
   const title = pickString(item, [
     "title", "label", "scenario_label", "name",
     "question", "q",
     "h3", "h4", "feature_label",
   ]);
-  const titleEl = el.querySelector("h3") ?? el.querySelector("h4");
+  const titleEl =
+    el.querySelector("h3") ??
+    el.querySelector("h4") ??
+    el.querySelector("summary span");
   setText(titleEl, title);
 
   // Body (first <p> inside the item)
