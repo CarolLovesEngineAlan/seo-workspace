@@ -143,12 +143,26 @@ function fillItems(section: HTMLElement, items: Json[]): void {
   itemEls.forEach((el, i) => {
     const item = items[i];
     if (!item || typeof item !== "object") return;
+
+    // Update <video> aria-label / title from item.video_label.
+    // Works for both showcase and testimonial cards.
+    fillVideoAriaLabel(el, item);
+
     if (isTestimonialItem(item)) {
       fillTestimonialItem(el, item);
     } else {
       fillDefaultItem(el, item);
     }
   });
+}
+
+function fillVideoAriaLabel(el: HTMLElement, item: Json): void {
+  const label = pickString(item, ["video_label", "video_aria_label", "aria_label"]);
+  if (!label) return;
+  for (const v of el.querySelectorAll("video")) {
+    v.setAttribute("aria-label", label);
+    v.setAttribute("title", label);
+  }
 }
 
 function isTestimonialItem(item: Json): boolean {
