@@ -136,7 +136,9 @@ function fillItems(section: HTMLElement, items: Json[]): void {
     if (!item || typeof item !== "object") return;
 
     // Eyebrow / chip label (small label above the title in features cards)
-    const eyebrow = pickString(item, ["eyebrow", "chip", "tag", "kicker", "section_label"]);
+    const eyebrow = pickString(item, [
+      "eyebrow", "eyebrow_label", "chip", "tag", "kicker", "section_label",
+    ]);
     if (eyebrow) {
       const eyebrowEl = findEyebrowSpan(el);
       setText(eyebrowEl, eyebrow);
@@ -159,6 +161,10 @@ function fillItems(section: HTMLElement, items: Json[]): void {
     ]);
     const ps = el.querySelectorAll("p");
     if (ps[0]) setText(ps[0], body);
+
+    // Optional second <p> — italic "Great for: ..." caption / tag line
+    const tail = pickString(item, ["great_for", "tags", "footnote", "caption"]);
+    if (tail && ps[1]) setText(ps[1], tail);
   });
 }
 
