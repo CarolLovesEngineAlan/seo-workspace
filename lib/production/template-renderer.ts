@@ -332,5 +332,16 @@ export function renderPageHtmlFromTemplate(pageType: string, json: unknown): str
     fillSection(section, segment);
   });
 
+  // Enable inline autoplay for every <video> in the exported draft.
+  // Browsers require muted + playsinline + autoplay together; templates
+  // already include muted and playsinline.
+  for (const v of root.querySelectorAll("video")) {
+    v.setAttribute("autoplay", "");
+    v.setAttribute("muted", "");
+    v.setAttribute("playsinline", "");
+    v.setAttribute("loop", "");
+    if (v.getAttribute("preload") === "none") v.setAttribute("preload", "auto");
+  }
+
   return buildHtmlDocument(data.meta as Json | undefined, root.toString());
 }
