@@ -29,7 +29,7 @@ const FEATURE_PAGE_PLAN: SectionPlan[] = [
 
 const MODEL_PAGE_PLAN: SectionPlan[] = [
   { jsonKey: "hero" },
-  { jsonKey: null },
+  { jsonKey: "gallery" },
   { jsonKey: "capabilities" },
   { jsonKey: "comparison" },
   { jsonKey: "how_to_use" },
@@ -101,6 +101,24 @@ function fillSection(section: HTMLElement, data: Json): void {
   if (cta) {
     const btn = findCtaElement(section);
     setText(btn, cta);
+  }
+
+  // Section-level <video> aria-label / title (e.g. hero hero-video, demo video)
+  // Only updates videos that are NOT inside an item — item videos are handled
+  // by fillItems via item.video_label.
+  const sectionVideoLabel = pickString(data, ["video_label", "video_aria_label"]);
+  if (sectionVideoLabel) {
+    for (const v of section.querySelectorAll("video")) {
+      let inItem = false;
+      let p: HTMLElement | null = v.parentNode as HTMLElement | null;
+      while (p && p !== section) {
+        if (p.getAttribute?.("data-pexo-block") === "item") { inItem = true; break; }
+        p = p.parentNode as HTMLElement | null;
+      }
+      if (inItem) continue;
+      v.setAttribute("aria-label", sectionVideoLabel);
+      v.setAttribute("title", sectionVideoLabel);
+    }
   }
 
   // Items array → fill each data-pexo-block="item"
