@@ -242,6 +242,7 @@ function collectVisibleSpans(root: HTMLElement): HTMLElement[] {
 // human-readable text (not just whitespace, not inside an SVG).
 function findEyebrowSpan(item: HTMLElement): HTMLElement | null {
   const spans = item.querySelectorAll("span");
+  const visible: HTMLElement[] = [];
   for (const sp of spans) {
     const txt = sp.text?.trim();
     if (!txt) continue;
@@ -253,9 +254,16 @@ function findEyebrowSpan(item: HTMLElement): HTMLElement | null {
       p = p.parentNode as HTMLElement | null;
     }
     if (insideSvg) continue;
-    return sp;
+    visible.push(sp);
+    if (visible.length >= 2) break;
   }
-  return null;
+  // Dual-chip layout: when the first two text spans share a parent (e.g. hero
+  // "USE CASE • ANIME VIDEO"), the first is a fixed category label and the
+  // second is the variable use_case_label — replace the second one.
+  if (visible.length >= 2 && visible[0].parentNode === visible[1].parentNode) {
+    return visible[1];
+  }
+  return visible[0] ?? null;
 }
 
 function buildHtmlDocument(meta: Json | undefined, body: string): string {
